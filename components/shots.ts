@@ -22,3 +22,7 @@ export const SHOTS: Record<string, Shot> = {
 }
 
 export const shotFor = (pathname: string): Shot => SHOTS[pathname] ?? SHOTS['/']
+
+/** The phone hero render (components/PhoneHero.tsx, made with ?capture=): the lobby view, shifted so the
+ * whole office is centred in a portrait frame. Capture-only; the live 3D keeps SHOTS['/']. */
+export const PHONE_HERO_SHOT: Shot = { pos: [10.99, 6.06, 10.72], target: [0.01, -3.4, -2.23], parallax: 0 }

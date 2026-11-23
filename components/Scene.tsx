@@ -17,11 +17,13 @@ import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import { usePathname, useRouter } from 'next/navigation'
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { shotFor, type Shot, type Vec3 } from './shots'
+import { PHONE_HERO_SHOT, shotFor, type Shot, type Vec3 } from './shots'
 import { ArcadeGame, type ArcadeTile } from './arcadeGame'
 import { arcadeBus } from './arcadeBus'
 import { memoBus, useOpenMemo } from './memoBus'
 import { LOW_POWER } from './perf'
+import { CAPTURE } from './capture'
+import { heroCover } from './heroMode'
 import { music } from './music'
 import { useDayPhase } from './daytime'
 import { site } from '@/content/site'
@@ -46,10 +48,10 @@ export default function Scene() {
     <div className="scene">
       <Canvas
         shadows={!LOW_POWER}
-        dpr={LOW_POWER ? [1, 1.25] : [1, 2]} // phones draw at about their real resolution, not 2x
+        dpr={CAPTURE ? 3 : LOW_POWER ? [1, 1.25] : [1, 2]} // phones draw at about their real resolution, not 2x
         // logarithmic depth: city signs, screens and neon strips sit a centimetre or two off their
         // walls; with plain depth they z-fight (flicker) far away whenever the camera moves
-        gl={{ logarithmicDepthBuffer: true }}
+        gl={{ logarithmicDepthBuffer: true, preserveDrawingBuffer: !!CAPTURE }}
         camera={{ fov: 50, position: [1, 3.2, 10], near: 0.15, far: 1200 }}
       >
         <color attach="background" args={[SHOW_CITY ? haze : '#000000']} />
@@ -244,6 +246,7 @@ function Office() {
         onHover={(h) => setHovered(h)}
         onSelect={go}
       />
+      {CAPTURE && <CaptureProbe hotspots={hotspots} />}
       <SectionBubbles
         hotspots={hotspots}
         current={here}
@@ -557,7 +560,7 @@ function SectionGlass({
   useFrame(({ clock }, dt) => {
     const t = clock.elapsedTime
     const k = 1 - Math.exp(-dt * 9)
-    const lobby = current === '/' && hovered === null
+    const lobby = current === '/' && hovered === null && !CAPTURE
     if (!lobby) tease.current.next = Math.max(tease.current.next, t + 2.5) // calm pause after hovering / memos
     else if (t >= tease.current.next && extras.length) {
       const s = extras[tease.current.i++ % extras.length]
@@ -581,7 +584,8 @@ function SectionGlass({
       const p = (t - s.teaseAt) / TEASE_LEN
       const teaseGlow = !on && lobby && p >= 0 && p <= 1 ? TEASE_PEAK * Math.pow(Math.sin(Math.PI * p), 1.5) : 0
       const u = s.material.uniforms
-      u.uGlow.value = Math.max(s.glow, teaseGlow)
+      const captureGlow = !!CAPTURE && !!(window as unknown as { __captureGlow?: boolean }).__captureGlow
+      u.uGlow.value = captureGlow && extras.includes(s) ? 1 : Math.max(s.glow, teaseGlow)
       u.uTime.value = t
       u.uInflate.value = 0.004 + 0.008 * u.uGlow.value // swells out slightly as it fades in
       const show = u.uGlow.value > 0
@@ -623,6 +627,36 @@ function SectionGlass({
  * by projecting a 3D point (drei's <Html> makes a React root per label, which crashes in
  * React 19 dev mode). Hovering the section in 3D (or the bubble) highlights it.
  */
+/** Capture mode: report where each hotspot lands on screen (fractions of the viewport) and
+ * expose the rendered frame, for the phone hero images. */
+function CaptureProbe({ hotspots }: { hotspots: HotspotInfo[] }) {
+  const { gl, camera, size } = useThree()
+  useEffect(() => {
+    document.documentElement.classList.add('is-capture')
+    ;(window as unknown as { __captureShot: () => string }).__captureShot = () => gl.domElement.toDataURL('image/png')
+  }, [gl])
+  const v = useMemo(() => new THREE.Vector3(), [])
+  useFrame(() => {
+    const toScreen = (p: THREE.Vector3) => {
+      v.copy(p).project(camera)
+      return [(v.x + 1) / 2, (1 - v.y) / 2]
+    }
+    const list = hotspots.map((h) => {
+      const { min, max } = h.box
+      let x0 = 1, y0 = 1, x1 = 0, y1 = 0
+      for (const x of [min.x, max.x])
+        for (const y of [min.y, max.y])
+          for (const z of [min.z, max.z]) {
+            const [sx, sy] = toScreen(new THREE.Vector3(x, y, z))
+            x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy)
+          }
+      return { link: h.link, label: h.label, top: toScreen(h.top), rect: [x0, y0, x1, y1] }
+    })
+    ;(window as unknown as { __capture: unknown }).__capture = { width: size.width, height: size.height, hotspots: list }
+  })
+  return null
+}
+
 function SectionBubbles({
   hotspots,
   current,
@@ -926,7 +960,8 @@ function PauseWhenScrolledAway() {
   useEffect(() => {
     let paused = false
     const check = () => {
-      const covered = window.scrollY >= window.innerHeight
+      // scrolled past, or the phone hero picture is covering it
+      const covered = window.scrollY >= window.innerHeight || heroCover.covered
       if (covered !== paused) {
         paused = covered
         setFrameloop(covered ? 'never' : 'always')
@@ -935,9 +970,11 @@ function PauseWhenScrolledAway() {
     check()
     window.addEventListener('scroll', check, { passive: true })
     window.addEventListener('resize', check)
+    const off = heroCover.on(check)
     return () => {
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
+      off()
       setFrameloop('always')
     }
   }, [setFrameloop])
@@ -996,7 +1033,7 @@ function CameraRig() {
 
   useFrame((state, dt) => {
     if (memo && !memoShotRef.current) memoShotRef.current = computeMemoShot()
-    const shot = (memo && memoShotRef.current) || shotFor(pathname)
+    const shot = CAPTURE ? PHONE_HERO_SHOT : (memo && memoShotRef.current) || shotFor(pathname)
     // smooth, frame-rate independent easing toward the current page's shot
     const k = 1 - Math.exp(-dt * 3)
     const p = shot.parallax

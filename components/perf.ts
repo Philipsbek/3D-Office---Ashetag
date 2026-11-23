@@ -8,7 +8,9 @@
 
 function detectLowPower(): boolean {
   if (typeof window === 'undefined') return false
-  const q = new URLSearchParams(window.location.search).get('quality')
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('capture')) return false // phone hero capture: always full quality
+  const q = params.get('quality')
   if (q === 'low') return true
   if (q === 'high') return false
   const coarse = window.matchMedia?.('(pointer: coarse)').matches ?? false

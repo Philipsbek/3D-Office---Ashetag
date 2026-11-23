@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <div className="hero" aria-label="Interactive 3D office — click a glowing marker to explore">
-        <p className="hero-hint">Click the office to explore · Scroll ↓</p>
+        <p className="hero-hint"><span className="hint-click">Click</span><span className="hint-tap">Tap</span> the office to explore · Scroll ↓</p>
       </div>
       <HomeContent />
     </>

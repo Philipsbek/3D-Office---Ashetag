@@ -647,3 +647,52 @@ sup.counter {
 @keyframes music-wave { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .music-toggle .wave { animation: none; } }
 @media (max-width: 640px) { .music-toggle { right: calc(var(--gutter) + 7px); bottom: 76px; width: 36px; height: 36px; } }
+
+/* capture mode (phone hero renders): only the 3D canvas is visible */
+html.is-capture body > *:not(.scene), html.is-capture .section-bubble, html.is-capture .loader { display: none !important; }
+
+/* "Click" on desktop, "Tap" on touch screens */
+.hint-tap { display: none; }
+@media (pointer: coarse) { .hint-click { display: none; } .hint-tap { display: inline; } }
+
+/* ---------- phone hero: a high-quality picture of the office (components/PhoneHero.tsx) ---------- */
+.phone-hero { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #05040a; container-type: size; }
+.phone-hero-frame {
+  /* like object-fit: cover, so the tap areas and bubbles stay on the picture */
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: max(100cqw, 100cqh * 1290 / 2796);
+}
+.phone-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; animation: phone-hero-in .8s ease-out both; }
+@keyframes phone-hero-in { from { opacity: 0; } to { opacity: 1; } }
+.phone-hero-spot {
+  position: absolute; background: none; border: 0; padding: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.phone-hero-spot:focus-visible { outline: 1px solid rgba(209, 235, 255, .6); outline-offset: 2px; }
+.phone-hero-bubble { position: absolute; z-index: 3; }
+.phone-hero-glow {
+  position: absolute; pointer-events: none; opacity: 0;
+  mix-blend-mode: plus-lighter;
+  /* the slow band of light: brighter where the mask is solid */
+  -webkit-mask-image: linear-gradient(115deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.5) 38%, #000 50%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.5) 100%);
+  mask-image: linear-gradient(115deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.5) 38%, #000 50%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.5) 100%);
+  -webkit-mask-size: 300% 100%; mask-size: 300% 100%;
+  animation: phone-glow 24s linear infinite;
+}
+/* 24 s loop, four spots 6 s apart: each glows for ~3.2 s (13%), the band crossing at the peak */
+@keyframes phone-glow {
+  0% { opacity: 0; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  6.6% { opacity: .6; }
+  13.3% { opacity: 0; -webkit-mask-position: 0% 0; mask-position: 0% 0; }
+  100% { opacity: 0; -webkit-mask-position: 0% 0; mask-position: 0% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .phone-hero-glow, .phone-hero-img { animation: none; } }
+.phone-hero-explore {
+  position: absolute; left: 50%; bottom: 128px; transform: translateX(-50%); z-index: 4;
+  display: inline-flex; gap: 8px; align-items: center;
+  padding: 9px 14px; border-radius: 9999px;
+  background: rgba(0, 0, 0, .72); border: 1px solid rgba(230, 230, 230, .3); color: var(--bone);
+  font: 600 13px/1 var(--sans); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: phone-hero-in .8s ease-out .6s both;
+}
+.phone-hero-explore span { color: var(--orange); }
