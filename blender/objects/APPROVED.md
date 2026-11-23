@@ -181,3 +181,4 @@ Placed as `BarSpot` (-1.85, 0, -4.44): back bar against the back wall (covers th
 | # | Asset | Module | Preview | Status |
 |---|-------|--------|---------|--------|
 | F18 | 40"-class curved ultrawide on a short stand, cyan back/chin light bars; screens: code editor + repo page (original UI, git.ashetag.dev) | `dev_monitor.py` -> `build_dev_monitor`, `make_dev_screens.py` | `../previews/dev_monitors.png` | Approved 2026-11-23 - applied (replaces the Razer-style monitors on both desks) |
+| F19 | Low vinyl-record cabinet for the boombox (record sleeves, amp, cyan lip strip, pink underglow); placed behind the lounge sofa, open front toward the camera, boombox on top | `boombox_stand.py` -> `build_boombox_stand` | `../previews/boombox_stand.png`, `../previews/boombox_stand_placed.png` | Approved 2026-11-24 - applied (BoomboxStandSpot; boombox moved onto it) |

@@ -192,6 +192,7 @@ import e_moped  # noqa: E402
 import cargo_crate  # noqa: E402
 import vending_machine  # noqa: E402
 import boombox  # noqa: E402
+import boombox_stand  # noqa: E402
 import potted_plant  # noqa: E402
 import floor_cables  # noqa: E402
 import glass_room  # noqa: E402
@@ -331,7 +332,12 @@ bar_kit.build_bar_area(bar_spot, name="Bar")
 merge_into(bar_spot, "BarMerged")
 crate2 = place("CrateSpot2", (6.2, 0, 0.9), -24)
 cargo_crate.build_cargo_crate(crate2, name="CrateSolo", size=(0.95, 0.55, 0.6))
-boom = place("BoomboxSpot", (-0.35, 0, -0.15), -22)
+# boombox on its vinyl-record stand, in the open floor behind the sofa (approved 2026-11-24).
+# The stand is its own spot so the boombox's beat pulse doesn't scale the stand.
+STAND_POS, STAND_YAW = (0.95, 0, -0.3), 55  # open front turned toward the camera, not the sofa back
+stand = place("BoomboxStandSpot", STAND_POS, STAND_YAW)
+boombox_stand.build_boombox_stand(stand, name="BoomboxStand")
+boom = place("BoomboxSpot", (STAND_POS[0], boombox_stand.TOP_Y, STAND_POS[2]), STAND_YAW - 8)
 boombox.build_boombox(boom, name="Boombox")
 plant = place("PlantSpot", (2.7, 0, -2.05), 0)
 potted_plant.build_potted_plant(plant, name="PottedPlant")

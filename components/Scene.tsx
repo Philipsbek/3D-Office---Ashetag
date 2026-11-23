@@ -32,10 +32,10 @@ import CityScape from './CityScape'
 // The city outside the windows (components/CityScape.tsx). Set to false to go back to a black void.
 const SHOW_CITY = true
 
-const MODEL_URL = '/models/office.glb?v=32' // bump after re-exporting so browsers fetch the new file
+const MODEL_URL = '/models/office.glb?v=34' // bump after re-exporting so browsers fetch the new file
 // office.glb size in bytes: lets the loading screen show a % when the server omits it.
 // Update together with MODEL_URL after re-exporting.
-const MODEL_BYTES = 3_574_224
+const MODEL_BYTES = 3_590_848
 setExpectedBytes(MODEL_BYTES)
 const DRACO_URL = '/draco/' // decoder copied from three/examples/jsm/libs/draco/gltf
 
