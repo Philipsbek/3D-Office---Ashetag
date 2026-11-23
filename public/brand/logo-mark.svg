@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 10 44 44">
+  <!-- Philips Bek mark (no tile): the Pinwheel on a transparent background -->
+  <path d="M32 32V12a10 10 0 0 1 10 10a10 10 0 0 1-10 10z" fill="#22e4ff" transform="rotate(0 32 32)"/>
+  <path d="M32 32V12a10 10 0 0 1 10 10a10 10 0 0 1-10 10z" fill="#7a8cff" transform="rotate(90 32 32)"/>
+  <path d="M32 32V12a10 10 0 0 1 10 10a10 10 0 0 1-10 10z" fill="#c06cff" transform="rotate(180 32 32)"/>
+  <path d="M32 32V12a10 10 0 0 1 10 10a10 10 0 0 1-10 10z" fill="#ff4fd8" transform="rotate(270 32 32)"/>
+</svg>

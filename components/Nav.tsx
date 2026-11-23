@@ -28,6 +28,7 @@ export default function Nav() {
   return (
     <header className="topbar">
       <Link href="/" className="wordmark-link">
+        <img src="/brand/logo-mark.svg" alt="" width={18} height={18} className="wordmark-mark" />
         {site.name}
       </Link>
       <nav className="topbar-links" aria-label="Main">

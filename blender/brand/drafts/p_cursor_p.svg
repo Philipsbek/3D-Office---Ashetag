@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a mouse cursor arrow with a P cut into it: click to build -->
+  <path d="M15 9l34 22-14.5 2.5 8.5 16-6.5 3.3-8.2-16.3L17 47z" fill="url(#g)"/>
+  <path d="M22 22h5.5a4.5 4.5 0 0 1 0 9H25v5h-3z M25 24.5v4h2.5a2 2 0 0 0 0-4z" fill="#0b0b10" fill-rule="evenodd"/>
+</svg>

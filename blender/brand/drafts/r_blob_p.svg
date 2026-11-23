@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a soft liquid blob in gradient with a P cut out of it -->
+  <path d="M33 8c11 0 22 7 23 19c1 11-5 22-15 27c-9 4-21 3-27-5c-6-8-6-20 0-30C19 12 25 8 33 8z" fill="url(#g)"/>
+  <path d="M23 18h10a8.5 8.5 0 0 1 0 17h-4v11h-6z M29 23.5v6h4a3 3 0 0 0 0-6z" fill="#0b0b10" fill-rule="evenodd"/>
+</svg>

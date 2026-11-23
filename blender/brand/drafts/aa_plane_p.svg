@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a paper plane taking off (launch / ship it); no letter -->
+  <path d="M10 33 54 12 42 52 30 40z" fill="url(#g)"/>
+  <path d="M30 40 54 12 25 36z" fill="#0b0b10" opacity="0.35"/>
+  <path d="M30 40l-2 12 7-8z" fill="#7a4dff"/>
+  <path d="M14 50c4-1 7-3 9-6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 4.5"/>
+</svg>

@@ -151,7 +151,12 @@ def build_loft_room(parent=None, name="LoftRoom", glass_left=True):
     for i, z in enumerate(range(int(Z0) + 1, int(Z1))):
         slab(f"SeamZ{i}", X0, X1 + 1.5, 0, 0.002, z - 0.008, z + 0.008, SEAM, root)
 
-    slab("BackWall", X0 - 0.3, X1 + 1.5, 0, WALL_H, Z0 - 0.3, Z0, CONCRETE, root)
+    # back wall, with an opening for the big upper-right window (clear glass, city view behind)
+    WX0, WX1, WY0, WY1 = 1.8, 6.4, 4.0, 6.0
+    slab("BackWall", X0 - 0.3, WX0, 0, WALL_H, Z0 - 0.3, Z0, CONCRETE, root)
+    slab("BackWallR", WX1, X1 + 1.5, 0, WALL_H, Z0 - 0.3, Z0, CONCRETE, root)
+    slab("BackWallBelowWindow", WX0, WX1, 0, WY0, Z0 - 0.3, Z0, CONCRETE, root)
+    slab("BackWallAboveWindow", WX0, WX1, WY1, WALL_H, Z0 - 0.3, Z0, CONCRETE, root)
     if glass_left:
         # approved B1 glazing on the left wall: floor-to-ceiling glass, one slim black
         # mullion, thin black sill and head, butting into the solid back wall
@@ -239,10 +244,13 @@ def build_loft_room(parent=None, name="LoftRoom", glass_left=True):
     tube("PipeUpperRight", [(1.5, MEZ_Y + 0.25, Z0 + 0.2), (6.9, MEZ_Y + 0.25, Z0 + 0.2)], 0.06, RUST, root)
     tube("PipeUpperRight2", [(1.5, MEZ_Y + 0.42, Z0 + 0.2), (6.9, MEZ_Y + 0.42, Z0 + 0.2)], 0.06, RUST, root)
 
-    # ---------------------------------------------------------------- big window (upper right, yellow glow)
+    # ---------------------------------------------------------------- big window (upper right): clear glass
+    # (was a solid yellow glow panel; now see-through to the night city behind the wall opening)
     wx0, wx1, wy0, wy1 = 1.8, 6.4, 4.0, 6.0
     c = 0.35  # chamfered corners
-    slab("WindowGlow", wx0, wx1, wy0, wy1, Z0 - 0.02, Z0 + 0.005, WINDOW, root)
+    slab("WindowGlass", wx0, wx1, wy0, wy1, Z0 - 0.16, Z0 - 0.14, _glass_mat(), root)
+    for k, x in enumerate((wx0 + (wx1 - wx0) / 3, wx0 + 2 * (wx1 - wx0) / 3)):  # two slim mullions
+        slab(f"WindowMullion{k}", x - 0.03, x + 0.03, wy0, wy1, Z0 - 0.17, Z0 - 0.11, STEEL, root)
     FR = STEEL
     slab("WindowFrameTop", wx0, wx1, wy1, wy1 + 0.2, Z0, Z0 + 0.22, FR, root)
     slab("WindowFrameBottom", wx0, wx1, wy0 - 0.2, wy0, Z0, Z0 + 0.28, FR, root)

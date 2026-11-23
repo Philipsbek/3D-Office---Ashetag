@@ -21,6 +21,8 @@ export const site = {
     { name: 'Grok', logo: '/logos/grok.svg' },
     { name: 'Gemini', logo: '/logos/gemini.svg' },
     { name: 'Kling', logo: '/logos/kling.svg' },
+    { name: 'Higgsfield', logo: '/logos/higgsfield.svg' },
+    { name: 'CapCut', logo: '/logos/capcut.svg' },
   ],
 
   // What I Build: the kinds of websites I offer. Images live in public/work/ (mock-ups

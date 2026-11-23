@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a neon-tube P like the signs in the office: glowing outline with a bright core -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 50V14h11a10 10 0 0 1 0 20H22" stroke="#ff4fd8" stroke-width="7" filter="url(#glow)" opacity="0.9"/>
+    <path d="M22 50V14h11a10 10 0 0 1 0 20H22" stroke="#ff4fd8" stroke-width="4"/>
+    <path d="M22 50V14h11a10 10 0 0 1 0 20H22" stroke="#ffd3f5" stroke-width="1.6"/>
+  </g>
+  <circle cx="44" cy="48" r="3" fill="#22e4ff" filter="url(#glow)"/><circle cx="44" cy="48" r="2" fill="#bff8ff"/>
+</svg>

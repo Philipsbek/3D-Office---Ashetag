@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a P whose stem is a lightning bolt: fast websites -->
+  <path d="M29 11h7a11 11 0 0 1 0 22h-6l1.3-7H36a4 4 0 0 0 0-8h-6.4z" fill="#fff"/>
+  <path d="M26 11h8L28.5 30H36L21 55l4.5-19H19z" fill="url(#g)"/>
+</svg>

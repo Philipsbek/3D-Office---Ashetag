@@ -97,7 +97,9 @@ sup.counter {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-.wordmark-link { font-size: 15px; letter-spacing: -0.02em; justify-self: start; }
+.wordmark-link { font-size: 15px; letter-spacing: -0.02em; justify-self: start; display: inline-flex; align-items: center; gap: 8px; }
+.wordmark-mark { width: 18px; height: 18px; flex: none; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.wordmark-link:hover .wordmark-mark { transform: rotate(90deg); } /* the pinwheel turns a quarter on hover */
 .topbar-links { display: flex; gap: 24px; }
 .topbar-links a, .topbar-right a { color: var(--bone); transition: color .15s; }
 .topbar-links a:hover, .topbar-right a:hover { color: var(--white); }

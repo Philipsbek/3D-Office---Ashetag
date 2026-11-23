@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- an isometric cube (the 3D office) with a P printed on its front-left face -->
+  <path d="M32 9 53 21 32 33 11 21z" fill="#ff4fd8"/>
+  <path d="M11 21 32 33v23L11 44z" fill="#22e4ff"/>
+  <path d="M53 21 32 33v23l21-12z" fill="#7a4dff"/>
+  <g transform="matrix(1 0.5714 0 1 16 24.1)">
+    <path d="M0 4h7.5a5 5 0 0 1 0 10H4v8H0z M4 7.5v3h3.5a1.5 1.5 0 0 0 0-3z" fill="#0b0b10" fill-rule="evenodd"/>
+  </g>
+</svg>

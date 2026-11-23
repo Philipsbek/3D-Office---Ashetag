@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="15" fill="#22e4ff"/>
+  <!-- minimal: a solid black B whose top bowl is a P-shaped cut-out window, on a bright tile -->
+  <path d="M17 12h18a10 10 0 0 1 6.5 17.6A11 11 0 0 1 36 52H17z M25 19v8h9a4 4 0 0 0 0-8z M25 34v11h10a5.5 5.5 0 0 0 0-11z" fill="#0b0b10" fill-rule="evenodd"/>
+  <circle cx="47" cy="47" r="4" fill="#ff4fd8"/>
+</svg>

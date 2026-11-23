@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a folded paper ribbon: the stem and the bowl are two bands, the fold shown in a darker shade -->
+  <path d="M17 13h8v38h-8z" fill="#22e4ff"/>
+  <path d="M25 13h8a11 11 0 0 1 0 22h-8v-8h8a3 3 0 0 0 0-6h-8z" fill="url(#g)"/>
+  <path d="M17 13h8l-8 8z" fill="#0e8fa8"/>
+  <path d="M25 27v8l-8-8z" fill="#0e8fa8" opacity="0.85"/>
+</svg>

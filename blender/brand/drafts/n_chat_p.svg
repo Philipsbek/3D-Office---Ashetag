@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a chat bubble whose tail is the stem of a P: "let's talk" -->
+  <path d="M14 30a17 17 0 1 1 17 17h-9v7l-8-7z" fill="url(#g)"/>
+  <path d="M23 22h8a7 7 0 0 1 0 14h-3v6h-5z M28 27v4h3a2 2 0 0 0 0-4z" fill="#0b0b10" fill-rule="evenodd"/>
+</svg>

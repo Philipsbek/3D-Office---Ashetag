@@ -29,10 +29,10 @@ import CityScape, { CITY_HAZE } from './CityScape'
 // The city outside the windows (components/CityScape.tsx). Set to false to go back to a black void.
 const SHOW_CITY = true
 
-const MODEL_URL = '/models/office.glb?v=30' // bump after re-exporting so browsers fetch the new file
+const MODEL_URL = '/models/office.glb?v=31' // bump after re-exporting so browsers fetch the new file
 // office.glb size in bytes: lets the loading screen show a % when the server omits it.
 // Update together with MODEL_URL after re-exporting.
-const MODEL_BYTES = 3_874_380
+const MODEL_BYTES = 3_890_500
 setExpectedBytes(MODEL_BYTES)
 const DRACO_URL = '/draco/' // decoder copied from three/examples/jsm/libs/draco/gltf
 
@@ -993,7 +993,7 @@ function Lights() {
   )
 }
 
-/** Yellow light pouring in from the big window, aimed down into the bedroom corner. */
+/** Cool city light falling in through the big clear window, aimed down into the corner. */
 function WindowLight() {
   const light = useRef<THREE.SpotLight>(null)
   const scene = useThree((st) => st.scene)
@@ -1010,8 +1010,8 @@ function WindowLight() {
       position={[4.1, 5.3, -5.2]}
       angle={1.0}
       penumbra={0.9}
-      intensity={90}
-      color="#ffc21a"
+      intensity={45}
+      color="#8fb4ff"
       castShadow
       shadow-mapSize={[1024, 1024]}
       shadow-bias={-0.0005}

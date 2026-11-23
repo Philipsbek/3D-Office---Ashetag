@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- "Bek" ~ beak: a round bird head shaped like the bowl of a P, a sharp beak, the neck as the stem -->
+  <path d="M18 54V30a14 14 0 1 1 14 14h-5v10z" fill="url(#g)"/>
+  <path d="M45 26l13 4-13 5z" fill="#ffb020"/>
+  <circle cx="35" cy="26" r="3.6" fill="#0b0b10"/>
+  <circle cx="36.2" cy="24.8" r="1.2" fill="#fff"/>
+</svg>

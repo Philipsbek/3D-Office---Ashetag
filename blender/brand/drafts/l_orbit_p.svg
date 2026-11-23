@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a P with a tilted orbit ring around its bowl and a small moon: a planet you build -->
+  <path d="M18 12h12a11 11 0 0 1 0 22h-4v18h-8z M26 19v8h4a4 4 0 0 0 0-8z" fill="#fff" fill-rule="evenodd"/>
+  <ellipse cx="31" cy="23" rx="24" ry="7.5" fill="none" stroke="url(#g)" stroke-width="3" transform="rotate(-18 31 23)"/>
+  <path d="M18 23h8" stroke="#fff" stroke-width="0"/>
+  <circle cx="53" cy="14.5" r="3.4" fill="#ff4fd8"/>
+</svg>

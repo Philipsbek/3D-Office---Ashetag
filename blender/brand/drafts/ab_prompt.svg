@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="56" y2="56"><stop offset="0" stop-color="#22e4ff"/><stop offset="1" stop-color="#ff4fd8"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+  <rect width="64" height="64" rx="15" fill="#0b0b10"/>
+  <!-- a terminal prompt: a cyan > chevron, a white P and a pink block cursor, "> P_" -->
+  <path d="M10 22l10 10-10 10" fill="none" stroke="#22e4ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M26 18h9a7.5 7.5 0 0 1 0 15h-4v13h-5z M31 23v5h4a2.5 2.5 0 0 0 0-5z" fill="#fff" fill-rule="evenodd"/>
+  <rect x="44" y="40" width="10" height="6" rx="1" fill="#ff4fd8"/>
+</svg>
