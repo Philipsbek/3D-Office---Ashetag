@@ -14,6 +14,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Suspense, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { LOW_POWER } from './perf'
 
 const GROUND = 36
 /** The night haze: distant things fade into it and it is the sky's glowing horizon. */
@@ -40,7 +41,7 @@ function rng(seed: number) {
 // over it as bridges. Every other block holds one building sized to fill it.
 // Past the edge of the grid the skyline towers stand in the haze.
 
-const CITY_URL = '/models/city.glb?v=18'
+const CITY_URL = '/models/city.glb?v=19'
 const DRACO_URL = '/draco/'
 const XR_HALF = 8.75 // half a street incl. sidewalks (= half the crossroads tile)
 const LANE_OFF = 2.2
@@ -87,6 +88,9 @@ const SHOW_BUILDINGS = true
 // street-level neon dioramas (G3 ramen corner, G4 neon courtyard), with footprints at
 // scale 1 (w along X, d along Z, facing +Z). The tall glass tower (G1) is not used.
 const BUILDINGS = ['GlassBlock', 'RamenCorner', 'NeonAlley']
+// simplified copies (about a fifth of the triangles) used for buildings far from the office
+const BUILDINGS_FAR = ['GlassBlock', 'RamenCornerLod', 'NeonAlleyLod']
+const FAR_FROM = LOW_POWER ? 60 : 120 // metres from the office where the simplified copies take over
 const FOOTPRINT: [number, number][] = [[27.6, 18.8], [16.0, 17.0], [16.0, 16.0]]
 const MAX_SCALE = 1.5
 // Blocks whose advert stays in frame AND unblocked from the lobby camera on desktop and
@@ -168,7 +172,7 @@ function useCityModels() {
         const src = m.material as THREE.MeshStandardMaterial
         let material: THREE.Material = src.clone()
         const emissive = src.emissive && src.emissive.getHex() !== 0
-        if (BUILDINGS.includes(name) && !emissive && !src.transparent && !src.name.includes('DarkGlass')) {
+        if ((BUILDINGS.includes(name) || BUILDINGS_FAR.includes(name)) && !emissive && !src.transparent && !src.name.includes('DarkGlass')) {
           // The city has no real lights on these models (their neon is emissive only), so lit
           // by the faint sky alone they read as flat grey blocks. Render them unlit in their own
           // colours with a fixed moonlight baked into vertex colours: roofs catch the moon, walls
@@ -187,6 +191,7 @@ function useCityModels() {
     }
     return {
       buildings: BUILDINGS.map((n) => get(n, false)),
+      buildingsFar: BUILDINGS_FAR.map((n) => get(n, false)),
       car: get('Car', true),
       lamps: [get('LampCyan', false), get('LampPink', false)],
       street: get('Street20', false),
@@ -229,13 +234,15 @@ function ModelInstances({ parts, matrices, count, colors, live }: { parts: Model
 }
 
 function StreetBuildings({ list }: { list: Placement[] }) {
-  const { buildings } = useCityModels()
-  const groups = useMemo(
-    () =>
-      buildings.map((_, m) => {
-        const mine = list.filter((p) => p.m === m)
+  const { buildings, buildingsFar } = useCityModels()
+  // each model twice: detailed copies near the office, simplified ones further out
+  const groups = useMemo(() => {
+    const out: { parts: ModelPart[]; count: number; matrices: Float32Array; key: string }[] = []
+    const o = new THREE.Object3D()
+    buildings.forEach((_, m) => {
+      for (const far of [false, true]) {
+        const mine = list.filter((p) => p.m === m && Math.hypot(p.x - ORIGIN.x, p.z - ORIGIN.y) > FAR_FROM === far)
         const arr = new Float32Array(mine.length * 16)
-        const o = new THREE.Object3D()
         mine.forEach((p, i) => {
           o.position.set(p.x, -GROUND, p.z)
           o.rotation.set(0, p.rot, 0)
@@ -243,15 +250,16 @@ function StreetBuildings({ list }: { list: Placement[] }) {
           o.updateMatrix()
           o.matrix.toArray(arr, i * 16)
         })
-        return { count: mine.length, matrices: arr }
-      }),
-    [buildings, list],
-  )
+        if (mine.length) out.push({ parts: far ? buildingsFar[m] : buildings[m], count: mine.length, matrices: arr, key: `${m}${far ? 'f' : 'n'}` })
+      }
+    })
+    return out
+  }, [buildings, buildingsFar, list])
   return (
     <>
-      {buildings.map((parts, m) =>
-        groups[m].count ? <ModelInstances key={m} parts={parts} matrices={groups[m].matrices} count={groups[m].count} /> : null,
-      )}
+      {groups.map((g) => (
+        <ModelInstances key={g.key} parts={g.parts} matrices={g.matrices} count={g.count} />
+      ))}
     </>
   )
 }
@@ -260,7 +268,7 @@ function StreetBuildings({ list }: { list: Placement[] }) {
  * glass in the office's two-pane glazing. Once the city has loaded, one snapshot
  * of it is taken from inside the tower so the glass reflects the real neon streets. */
 function TowerBase() {
-  const { tower, buildings } = useCityModels()
+  const { tower, buildings, buildingsFar } = useCityModels()
   const { gl, scene } = useThree()
   const group = useRef<THREE.Group>(null)
   const matrices = useMemo(() => {
@@ -279,7 +287,7 @@ function TowerBase() {
       g.visible = false // don't reflect the tower in itself
       cam.update(gl, scene)
       g.visible = true
-      ;[...tower, ...buildings.flat()].forEach((p) => {
+      ;[...tower, ...buildings.flat(), ...buildingsFar.flat()].forEach((p) => {
         if (p.material.name !== 'Loft_MinDarkGlass') return
         const m = p.material as THREE.MeshStandardMaterial
         m.envMap = rt.texture
@@ -291,7 +299,7 @@ function TowerBase() {
       clearTimeout(id)
       rt.dispose()
     }
-  }, [gl, scene, tower, buildings])
+  }, [gl, scene, tower, buildings, buildingsFar])
   return (
     <group ref={group}>
       <ModelInstances parts={tower} matrices={matrices} count={1} />
@@ -530,7 +538,8 @@ function StreetGrid() {
     const cars: { lane: number; d: number; v: number; vmax: number; commit: number; commitD: number }[] = []
     lanes.forEach((ln, i) => {
       const near = Math.abs(ln.l.c - (ln.l.axis === 'x' ? ORIGIN.y : ORIGIN.x)) < 110
-      const n = near ? 2 : 1 // light traffic: a few cars near the office, one per lane further out
+      // light traffic: a few cars near the office, one per lane further out (phones: one near the office, every other lane further out)
+      const n = LOW_POWER ? (near ? 1 : i % 2) : near ? 2 : 1
       for (let k = 0; k < n; k++) {
         let d = ((k + r() * 0.5) / n) * ln.len
         // never start inside a crossroads (or right at its line): move back to clear road

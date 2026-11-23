@@ -21,6 +21,7 @@ import { shotFor, type Shot, type Vec3 } from './shots'
 import { ArcadeGame, type ArcadeTile } from './arcadeGame'
 import { arcadeBus } from './arcadeBus'
 import { memoBus, useOpenMemo } from './memoBus'
+import { LOW_POWER } from './perf'
 import { site } from '@/content/site'
 import { markReady, setExpectedBytes, trackProgress } from './loadProgress'
 import Loader from './Loader'
@@ -29,10 +30,10 @@ import CityScape, { CITY_HAZE } from './CityScape'
 // The city outside the windows (components/CityScape.tsx). Set to false to go back to a black void.
 const SHOW_CITY = true
 
-const MODEL_URL = '/models/office.glb?v=31' // bump after re-exporting so browsers fetch the new file
+const MODEL_URL = '/models/office.glb?v=32' // bump after re-exporting so browsers fetch the new file
 // office.glb size in bytes: lets the loading screen show a % when the server omits it.
 // Update together with MODEL_URL after re-exporting.
-const MODEL_BYTES = 3_890_500
+const MODEL_BYTES = 3_574_224
 setExpectedBytes(MODEL_BYTES)
 const DRACO_URL = '/draco/' // decoder copied from three/examples/jsm/libs/draco/gltf
 
@@ -40,8 +41,8 @@ export default function Scene() {
   return (
     <div className="scene">
       <Canvas
-        shadows
-        dpr={[1, 2]}
+        shadows={!LOW_POWER}
+        dpr={LOW_POWER ? [1, 1.25] : [1, 2]} // phones draw at about their real resolution, not 2x
         camera={{ fov: 50, position: [1, 3.2, 10], near: 0.05, far: 1200 }}
       >
         <color attach="background" args={[SHOW_CITY ? CITY_HAZE : '#000000']} />
@@ -56,6 +57,7 @@ export default function Scene() {
         <CameraRig />
         <PauseWhenScrolledAway />
         <Effects />
+        <PerfLog />
       </Canvas>
       <Loader />
     </div>
@@ -155,7 +157,7 @@ function Office() {
       if (!mesh.isMesh) return
       const glowing = (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity > 0 &&
         !(mesh.material as THREE.MeshStandardMaterial).emissive.equals(new THREE.Color(0, 0, 0))
-      mesh.castShadow = !glowing
+      mesh.castShadow = !glowing && !LOW_POWER
       mesh.receiveShadow = true
       // the big window glows less on the site than in Blender, so the bloom
       // doesn't wash out the Services board and its note cards
@@ -967,35 +969,41 @@ function CameraRig() {
 // Lights stay in code so they're easy to tweak. The next step for a
 // Basement-style look is baking lighting into textures in Blender.
 
+// Cyberpunk loft: near-black ambient, one colour per zone (like the reference).
+const POINT_LIGHTS = [
+  { pos: [4.0, 4.5, -3.6] as Vec3, intensity: 14, color: '#ffb020' },
+  { pos: [-4.6, 5.6, -4.6] as Vec3, intensity: 14, color: '#38e0c8' },
+  { pos: [-4.4, 4.5, -3.2] as Vec3, intensity: 2, color: '#ffe2cc' },
+  { pos: [-1.1, 5.1, -4.4] as Vec3, intensity: 16, color: '#3a6bff' },
+  { pos: [-0.5, 4.9, -4.3] as Vec3, intensity: 9, color: '#ff2a3a' },
+  { pos: [-4.2, 2.2, -4.4] as Vec3, intensity: 30, color: '#ff2438' },
+  { pos: [-6.3, 1.7, -3.8] as Vec3, intensity: 8, color: '#ff5fb0' },
+  { pos: [0.9, 2.2, -4.6] as Vec3, intensity: 22, color: '#2aa8ff' },
+  { pos: [5.3, 1.3, -5.6] as Vec3, intensity: 28, color: '#ff7a14' },
+  { pos: [5.3, 1.4, -4.2] as Vec3, intensity: 12, color: '#ff8a2a' },
+  { pos: [-2.2, 2.0, -0.6] as Vec3, intensity: 6, color: '#9fdcff' },
+  { pos: [0.6, 2.6, 1.6] as Vec3, intensity: 12, color: '#9fb6d8' },
+  { pos: [-5.7, 2.2, -4.0] as Vec3, intensity: 7, color: '#ffa040' },
+  { pos: [0.9, 2.1, -4.25] as Vec3, intensity: 5, color: '#22e4ff' },
+  { pos: [-2.35, 1.9, -4.1] as Vec3, intensity: 5, color: '#ff2bd6' },
+  { pos: [0.6, 0.6, 1.2] as Vec3, intensity: 5, color: '#ff2bd6' },
+  { pos: [0.25, 1.0, 2.3] as Vec3, intensity: 3, color: '#22e4ff' },
+  { pos: [7.55, 1.2, -4.4] as Vec3, intensity: 6, color: '#22e4ff' },
+  { pos: [5.6, 1.4, 2.3] as Vec3, intensity: 4, color: '#ff2bd6' },
+]
+// phone mode keeps only the strongest zone lights (the neon strips glow on their own anyway)
+const PHONE_LIGHTS = [...POINT_LIGHTS].sort((x, y) => y.intensity - x.intensity).slice(0, 8)
+
 function Lights() {
-  // Cyberpunk loft: near-black ambient, one colour per zone (like the reference).
-  // Only the window light casts shadows, to keep it fast.
+  // Only the window light casts shadows (and only on desktop), to keep it fast.
+  const list = LOW_POWER ? PHONE_LIGHTS : POINT_LIGHTS
   return (
     <>
-      <hemisphereLight args={['#4a5a78', '#120a0e', 0.35]} />
-      {/* upper floor */}
+      <hemisphereLight args={['#4a5a78', '#120a0e', LOW_POWER ? 0.5 : 0.35]} />
       <WindowLight />
-      <pointLight position={[4.0, 4.5, -3.6]} intensity={14} color="#ffb020" />
-      <pointLight position={[-4.6, 5.6, -4.6]} intensity={14} color="#38e0c8" />
-      <pointLight position={[-4.4, 4.5, -3.2]} intensity={2} color="#ffe2cc" />
-      <pointLight position={[-1.1, 5.1, -4.4]} intensity={16} color="#3a6bff" />
-      <pointLight position={[-0.5, 4.9, -4.3]} intensity={9} color="#ff2a3a" />
-      {/* lower floor */}
-      <pointLight position={[-4.2, 2.2, -4.4]} intensity={30} color="#ff2438" />
-      <pointLight position={[-6.3, 1.7, -3.8]} intensity={8} color="#ff5fb0" />
-      <pointLight position={[0.9, 2.2, -4.6]} intensity={22} color="#2aa8ff" />
-      <pointLight position={[5.3, 1.3, -5.6]} intensity={28} color="#ff7a14" />
-      <pointLight position={[5.3, 1.4, -4.2]} intensity={12} color="#ff8a2a" />
-      <pointLight position={[-2.2, 2.0, -0.6]} intensity={6} color="#9fdcff" />
-      <pointLight position={[0.6, 2.6, 1.6]} intensity={12} color="#9fb6d8" />
-      {/* furnishing round: warm bulbs, neon pendants, lounge, servers, pinball */}
-      <pointLight position={[-5.7, 2.2, -4.0]} intensity={7} color="#ffa040" />
-      <pointLight position={[0.9, 2.1, -4.25]} intensity={5} color="#22e4ff" />
-      <pointLight position={[-2.35, 1.9, -4.1]} intensity={5} color="#ff2bd6" />
-      <pointLight position={[0.6, 0.6, 1.2]} intensity={5} color="#ff2bd6" />
-      <pointLight position={[0.25, 1.0, 2.3]} intensity={3} color="#22e4ff" />
-      <pointLight position={[7.55, 1.2, -4.4]} intensity={6} color="#22e4ff" />
-      <pointLight position={[5.6, 1.4, 2.3]} intensity={4} color="#ff2bd6" />
+      {list.map((l, i) => (
+        <pointLight key={i} position={l.pos} intensity={LOW_POWER ? l.intensity * 1.15 : l.intensity} color={l.color} />
+      ))}
     </>
   )
 }
@@ -1019,7 +1027,7 @@ function WindowLight() {
       penumbra={0.9}
       intensity={45}
       color="#8fb4ff"
-      castShadow
+      castShadow={!LOW_POWER}
       shadow-mapSize={[1024, 1024]}
       shadow-bias={-0.0005}
       shadow-normalBias={0.03}
@@ -1030,8 +1038,8 @@ function WindowLight() {
 /** Soft glow around neon tubes, screens and LEDs (anything brighter than ~1). */
 function Effects() {
   return (
-    <EffectComposer multisampling={4}>
-      <Bloom mipmapBlur luminanceThreshold={0.85} luminanceSmoothing={0.2} intensity={0.7} radius={0.7} />
+    <EffectComposer multisampling={LOW_POWER ? 0 : 4}>
+      <Bloom mipmapBlur levels={LOW_POWER ? 4 : 8} luminanceThreshold={0.85} luminanceSmoothing={0.2} intensity={0.7} radius={0.7} />
     </EffectComposer>
   )
 }
@@ -1082,4 +1090,33 @@ function servicesTexture() {
   tex.colorSpace = THREE.SRGBColorSpace
   tex.flipY = false
   return tex
+}
+
+
+/** Debug: with ?perf=1 in the address, log frame rate + draw calls every 2 s (for tuning). */
+function PerfLog() {
+  const gl = useThree((st) => st.gl)
+  const on = useMemo(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('perf'), [])
+  const acc = useRef({ t: 0, n: 0, calls: 0, tris: 0 })
+  useEffect(() => {
+    if (on) gl.info.autoReset = false // count every pass of a frame (scene, shadows, glow), not just the last
+  }, [gl, on])
+  useFrame((_, dt) => {
+    if (!on) return
+    const a = acc.current
+    // the counters now hold everything drawn in the previous frame
+    a.calls = Math.max(a.calls, gl.info.render.calls)
+    a.tris = Math.max(a.tris, gl.info.render.triangles)
+    gl.info.reset()
+    a.t += dt
+    a.n++
+    if (a.t >= 2) {
+      console.log(`[perf] fps ${(a.n / a.t).toFixed(0)} | draw calls ${a.calls} | triangles ${a.tris} | dpr ${gl.getPixelRatio()}`)
+      a.t = 0
+      a.n = 0
+      a.calls = 0
+      a.tris = 0
+    }
+  })
+  return null
 }

@@ -70,6 +70,19 @@ for name, root in assets.items():
         bpy.ops.object.modifier_apply(modifier="Lighter")
     tris = sum(len(p.vertices) - 2 for p in joined.data.polygons)
     print("ASSET", name, "tris", tris, "materials", len(joined.data.materials))
+    if name in ("RamenCorner", "NeonAlley"):
+        # far-away copy for distant streets: same silhouette, a fraction of the triangles
+        lod = joined.copy()
+        lod.data = joined.data.copy()
+        lod.name = lod.data.name = name + "Lod"
+        bpy.context.collection.objects.link(lod)
+        bpy.ops.object.select_all(action="DESELECT")
+        lod.select_set(True)
+        bpy.context.view_layer.objects.active = lod
+        dec = lod.modifiers.new("Far", "DECIMATE")
+        dec.ratio = 0.18
+        bpy.ops.object.modifier_apply(modifier="Far")
+        print("ASSET", lod.name, "tris", sum(len(p.vertices) - 2 for p in lod.data.polygons))
 
 for ob in [o for o in bpy.data.objects if o.type == "EMPTY"]:
     bpy.data.objects.remove(ob, do_unlink=True)

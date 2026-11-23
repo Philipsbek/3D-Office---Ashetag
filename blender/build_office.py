@@ -385,6 +385,68 @@ for k, x in enumerate((-1.6, 2.6)):  # hanging from the mezzanine railing, over 
     hpl = place(f"HangingPlantSpot{k}", (x, rail_y + 0.06, hook_z), 0)
     clutter.build_hanging_plant(hpl, name=f"HangingPlant{k}", drop=1.0, seed=6 + k)
 
+# ---------------------------------------------------------------- merge static props (performance)
+# Every top-level group (the loft room, each furniture spot) becomes ONE mesh with one primitive
+# per material, so the site draws a few hundred things per frame instead of ~1,500 - the biggest
+# win for phones. Kept separate: anything the site animates, clicks or swaps by name, and any
+# image-textured part (screens, rug, posters) so its UVs survive.
+PROTECT = {
+    "ArcadeScreen", "TVScreen",            # live canvas screens
+    "FanRotor0", "FanRotor1",              # spinning fans
+    "LoungeSetHoloShape",                  # spinning hologram
+    "Character", "Typer", "Sleeper",       # animated people (breathing, blinking, typing)
+    "HeroSeat",                            # the hero's swivel chair (turns with the hero)
+}
+
+
+def _textured(o):
+    return o.type == "MESH" and any(
+        m and m.use_nodes and any(n.type == "TEX_IMAGE" for n in m.node_tree.nodes) for m in o.data.materials
+    )
+
+
+def merge_static(group):
+    keep_roots = []
+
+    def walk(o):
+        for c in list(o.children):
+            if c.name in PROTECT or _textured(c):
+                keep_roots.append(c)   # whole subtree stays as is
+            else:
+                walk(c)
+
+    walk(group)
+    keep = set(keep_roots)
+    for r in keep_roots:
+        keep.update(r.children_recursive)
+    for r in keep_roots:  # lift protected parts up to the group, same place in the world
+        mw = r.matrix_world.copy()
+        r.parent = group
+        r.matrix_world = mw
+    parts = [o for o in group.children_recursive if o not in keep and o.type in ("MESH", "CURVE", "FONT")]
+    if len(parts) >= 2:
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in parts:
+            o.select_set(True)
+        bpy.context.view_layer.objects.active = parts[0]
+        bpy.ops.object.convert(target="MESH")
+        bpy.ops.object.parent_clear(type="CLEAR_KEEP_TRANSFORM")
+        bpy.ops.object.join()
+        merged = bpy.context.active_object
+        merged.name = merged.data.name = f"{group.name}Static"
+        merged.parent = group
+        merged.matrix_parent_inverse = group.matrix_world.inverted()
+    # tidy: drop marker empties left with nothing under them (named spots the site uses stay)
+    for e in sorted([o for o in group.children_recursive if o.type == "EMPTY" and o not in keep], key=lambda o: -len(o.children_recursive)):
+        if not any(c.type != "EMPTY" for c in e.children_recursive) and not e.children:
+            bpy.data.objects.remove(e, do_unlink=True)
+
+
+_before = sum(1 for o in bpy.data.objects if o.type == "MESH")
+for g in [o for o in bpy.data.objects if o.parent is None and o.type == "EMPTY"]:
+    merge_static(g)
+print("MERGED static props:", _before, "->", sum(1 for o in bpy.data.objects if o.type == "MESH"), "mesh objects")
+
 # ---------------------------------------------------------------- save + export
 # 1) Blender exports an uncompressed file to blender/out/office.raw.glb
 # 2) glTF-Transform (npm dev dependency) shrinks it for the web:
