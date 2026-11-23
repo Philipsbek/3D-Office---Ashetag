@@ -239,7 +239,8 @@ function ProjectLetter({ work, from, source, onClosed }: { work: Work; from: Rec
                   <div className="letter-meta">
                     <h3>{p.name}</h3>
                     <p>
-                      {p.type} · {p.year}
+                      {p.type}
+                      {p.year ? ` · ${p.year}` : ''}
                     </p>
                   </div>
                   {p.url ? (

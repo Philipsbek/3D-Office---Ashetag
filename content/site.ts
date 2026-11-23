@@ -35,13 +35,22 @@ export const site = {
       description:
         'I can build the website your business needs: a focused landing page to launch a product, a full business site with booking and pages your team can edit, or an online store that loads fast and checks out smoothly on any device.',
       services: ['Landing pages', 'Business websites', 'Online stores', 'CMS · SEO', 'E-commerce · Payments'],
-      // Past projects on the back of the card (click the image).
-      // PLACEHOLDERS for now: swap in the real projects, screenshots and links when ready.
+      // Past projects on the back of the card (click the image), from philipsbek.com/portfolio.
+      // "Design concept" = concept sites I designed and built; the rest are live client builds.
       projects: [
-        { name: 'Prism K1', type: 'Landing page', year: '2026', image: '/work/build-landing.jpg', url: '' },
-        { name: 'Neon Motors', type: 'Business website', year: '2026', image: '/work/build-business.jpg', url: '' },
-        { name: 'Loftgear', type: 'Online store', year: '2025', image: '/work/build-store.jpg', url: '' },
-        { name: 'Studio Loft', type: 'Business website', year: '2025', image: '/work/desk.jpg', url: '' },
+        { name: 'Eztidor Solution — Kuantan Homestays', type: 'Business website', year: '', image: '/work/projects/eztidor.jpg', url: 'https://www.eztidor.com' },
+        { name: 'Nova — Electric Marine', type: 'Design concept', year: '', image: '/work/projects/arc.jpg', url: 'https://design-arc-eight.vercel.app' },
+        { name: 'AsheTag — Web Design Studio', type: 'Agency website', year: '', image: '/work/projects/ashetag.jpg', url: 'https://ashetag.com' },
+        { name: 'AER — Creative Workspace', type: 'Design concept', year: '', image: '/work/projects/air.jpg', url: 'https://design-air.vercel.app' },
+        { name: 'Cards Against Humanity', type: 'Design concept', year: '', image: '/work/projects/cards-against-humanity.jpg', url: 'https://design-cards-against-humanity.vercel.app' },
+        { name: 'SoundCloud — Discover UI', type: 'Design concept', year: '', image: '/work/projects/soundcloud.jpg', url: 'https://design-sound-cloud.vercel.app' },
+        { name: 'Cora — AI Email Assistant', type: 'Design concept', year: '', image: '/work/projects/cora.jpg', url: 'https://design-cora.vercel.app' },
+        { name: 'Klinik Pergigian Kita', type: 'Business website', year: '', image: '/work/projects/klinik-pergigian-kita.jpg', url: 'https://klinikpergigiankita.com' },
+        { name: 'Muheet Oil Refining', type: 'Business website', year: '', image: '/work/projects/muheet-oil-refining.jpg', url: 'https://muheet.ly' },
+        { name: 'MekaVerse — Digital Art Gallery', type: 'Design concept', year: '', image: '/work/projects/mekaverse.jpg', url: 'https://design-meka-verse.vercel.app' },
+        { name: 'Morphic — Text-to-Anime', type: 'Design concept', year: '', image: '/work/projects/morphic.jpg', url: 'https://design-morphic.vercel.app' },
+        { name: 'Pop Site — Site Builder', type: 'Design concept', year: '', image: '/work/projects/pop-site.jpg', url: 'https://design-pop-site.vercel.app' },
+        { name: 'Beauty Talent Academy', type: 'Business website', year: '', image: '/work/projects/beauty-talent-academy.jpg', url: 'https://beauty-talent-academy.vercel.app' },
       ],
     },
     {
@@ -49,9 +58,8 @@ export const site = {
       image: '/work/build-app.jpg',
       description: 'I can build dashboards, booking systems and portals with accounts, live data and real-time views.',
       services: ['Accounts', 'Databases', 'APIs'],
-      // PLACEHOLDER: replace with real web app projects
       projects: [
-        { name: 'Deskhub', type: 'Booking dashboard', year: '2026', image: '/work/build-app.jpg', url: '' },
+        { name: 'Stackceipt', type: 'Software spend tracker', year: '2026', image: '/work/projects/stackceipt.jpg', url: 'https://stackceipt-beta.vercel.app' },
       ],
     },
   ],

@@ -250,6 +250,7 @@ sup.counter {
 .letter-link { font-size: 13px; line-height: 1.23; color: var(--bone); border-bottom: 1px solid var(--hairline); padding-bottom: 2px; white-space: nowrap; }
 .letter-link:hover { border-color: var(--bone); }
 .letter-link.is-soon { color: var(--ash); border-color: transparent; }
+@media (min-width: 1000px) { .letter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 759px) {
   .letter-back { padding: 16px; }
   .letter-grid { grid-template-columns: 1fr; }
