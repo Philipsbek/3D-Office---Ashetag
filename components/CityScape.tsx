@@ -44,7 +44,7 @@ function rng(seed: number) {
 // over it as bridges. Every other block holds one building sized to fill it.
 // Past the edge of the grid the skyline towers stand in the haze.
 
-const CITY_URL = '/models/city.glb?v=19'
+const CITY_URL = '/models/city.glb?v=20'
 const DRACO_URL = '/draco/'
 const XR_HALF = 8.75 // half a street incl. sidewalks (= half the crossroads tile)
 const LANE_OFF = 2.2
@@ -93,6 +93,8 @@ const SHOW_BUILDINGS = true
 const BUILDINGS = ['GlassBlock', 'RamenCorner', 'NeonAlley']
 // simplified copies (about a fifth of the triangles) used for buildings far from the office
 const BUILDINGS_FAR = ['GlassBlock', 'RamenCornerLod', 'NeonAlleyLod']
+// approved street tree (three variations), unlit + moonlit like the buildings
+const TREES = ['StreetTree1', 'StreetTree2', 'StreetTree3']
 const FAR_FROM = LOW_POWER ? 60 : 120 // metres from the office where the simplified copies take over
 const FOOTPRINT: [number, number][] = [[27.6, 18.8], [16.0, 17.0], [16.0, 16.0]]
 const MAX_SCALE = 1.5
@@ -175,7 +177,7 @@ function useCityModels() {
         const src = m.material as THREE.MeshStandardMaterial
         let material: THREE.Material = src.clone()
         const emissive = src.emissive && src.emissive.getHex() !== 0
-        if ((BUILDINGS.includes(name) || BUILDINGS_FAR.includes(name)) && !emissive && !src.transparent && !src.name.includes('DarkGlass')) {
+        if ((BUILDINGS.includes(name) || BUILDINGS_FAR.includes(name) || TREES.includes(name)) && !emissive && !src.transparent && !src.name.includes('DarkGlass')) {
           // The city has no real lights on these models (their neon is emissive only), so lit
           // by the faint sky alone they read as flat grey blocks. Render them unlit in their own
           // colours with a fixed moonlight baked into vertex colours: roofs catch the moon, walls
@@ -202,6 +204,7 @@ function useCityModels() {
       crossroads: get('Crossroads', false),
       signal: get('TrafficLight', false),
       tower: get('MinimalTowerBase', false),
+      trees: TREES.map((n) => get(n, false)),
     }
   }, [scene])
 }
@@ -867,6 +870,63 @@ function Sky({ day }: { day: Palette }) {
   )
 }
 
+/* ------------------------------------------------------------------ street trees */
+
+const TREE_R = LOW_POWER ? 110 : 160 // only plant the streets within sight of the office
+const TREE_ACROSS = 5.85 // street centre to tree centre: on the sidewalk, just inside the kerb
+const TREE_STEP = 10 // metres between trees along a sidewalk
+
+/** The approved street tree (three variations) planted along the sidewalks near the office,
+ * clear of the lamps, crossroads and the canal bridges. One instanced mesh per variation part. */
+function StreetTrees({ brightness = 1 }: { brightness?: number }) {
+  const { trees } = useCityModels()
+  useEffect(() => {
+    for (const p of trees.flat()) {
+      const base = p.material.userData.baseColor as THREE.Color | undefined
+      if (base) (p.material as THREE.MeshBasicMaterial).color.copy(base).multiplyScalar(brightness)
+    }
+  }, [trees, brightness])
+  const groups = useMemo(() => {
+    const r = rng(77)
+    const per: number[][] = trees.map(() => [])
+    const o = new THREE.Object3D()
+    for (const l of GRID_LINES) {
+      const stops = [l.from, ...l.cross.flatMap((p) => [p - XR_HALF, p + XR_HALF]), l.to]
+      for (let i = 0; i < stops.length; i += 2) {
+        const a0 = stops[i], a1 = stops[i + 1]
+        if (a1 - a0 < 12) continue
+        const mid = lineWorld(l, (a0 + a1) / 2, 0)
+        const lit = Math.hypot(mid.x - ORIGIN.x, mid.z - ORIGIN.y) <= 170 // this stretch has lamps
+        for (const side of [1, -1]) {
+          const lamp = side > 0 ? a0 + 6 : a1 - 6 // the lamp on this side (see StreetGrid)
+          const n = Math.floor((a1 - a0 - 6) / TREE_STEP)
+          const start = (a0 + a1) / 2 - ((n - 1) * TREE_STEP) / 2 + (side > 0 ? 0 : TREE_STEP / 2)
+          for (let k = 0; k < n; k++) {
+            const a = start + k * TREE_STEP
+            if (a < a0 + 3 || a > a1 - 3) continue
+            if (lit && Math.abs(a - lamp) < 3.5) continue
+            const p = lineWorld(l, a, side * TREE_ACROSS)
+            if (Math.hypot(p.x - ORIGIN.x, p.z - ORIGIN.y) > TREE_R) continue
+            // no trees on the bridges over the canal (south of the tower)
+            if (Math.abs(p.x - CANAL_X) < CANAL_HALF + 1.5 && p.z > CANAL_TOP) continue
+            o.position.set(p.x, -GROUND + 0.03 + 0.16, p.z)
+            o.rotation.set(0, r() * Math.PI * 2, 0)
+            o.scale.setScalar(0.9 + r() * 0.2)
+            o.updateMatrix()
+            per[Math.floor(r() * trees.length)].push(...o.matrix.toArray())
+          }
+        }
+      }
+    }
+    return per.map((m, i) => ({ parts: trees[i], count: m.length / 16, matrices: new Float32Array(m) }))
+  }, [trees])
+  return (
+    <>
+      {groups.map((g, i) => g.count > 0 && <ModelInstances key={i} parts={g.parts} matrices={g.matrices} count={g.count} />)}
+    </>
+  )
+}
+
 export default function CityScape({ day, rain = false }: { day: Palette; rain?: boolean }) {
   const buildings = useLayout()
   return (
@@ -876,6 +936,7 @@ export default function CityScape({ day, rain = false }: { day: Palette; rain?: 
       <Suspense fallback={null}>
         <TowerBase />
         {SHOW_BUILDINGS && <StreetBuildings list={buildings} brightness={day.city} />}
+        <StreetTrees brightness={day.city} />
         <StreetGrid rain={rain} />
       </Suspense>
       {rain && <Rain />}

@@ -29,6 +29,7 @@ import glass_city  # noqa: E402
 import ramen_corner  # noqa: E402
 import neon_alley  # noqa: E402
 import city_roads  # noqa: E402
+import street_tree  # noqa: E402
 
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 OUT_GLB = os.path.join(ROOT, "public", "models", "city.glb")
@@ -45,6 +46,10 @@ assets = {
     "GlassBlock": glass_city.build_g2_block(None, "G2"),
     "RamenCorner": ramen_corner.build_ramen_corner(None, "RC"),
     "NeonAlley": neon_alley.build_neon_alley(None, "NA"),
+    # approved street tree (2026-11-24): three variations for the sidewalks
+    "StreetTree1": street_tree.build_street_tree(None, "T1", seed=1, height=5.0),
+    "StreetTree2": street_tree.build_street_tree(None, "T2", seed=2, height=5.3),
+    "StreetTree3": street_tree.build_street_tree(None, "T3", seed=3, height=5.6),
 }
 
 for ob in [o for o in bpy.data.objects if o.type == "LIGHT"]:
