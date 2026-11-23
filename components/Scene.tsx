@@ -461,6 +461,7 @@ const glassFrag = /* glsl */ `
   uniform float uGlow;
   uniform float uTime;
   uniform float uSweepStart;
+  uniform float uSpeed;
   varying vec3 vNormal;
   varying vec3 vView;
   varying vec3 vWorld;
@@ -468,7 +469,7 @@ const glassFrag = /* glsl */ `
     #include <logdepthbuf_fragment>
     float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.0);
     // one diagonal band of light that sweeps across each time the hover starts
-    float d = (vWorld.x + vWorld.y * 0.8) * 0.45 - (uTime - uSweepStart) * 2.2 + 2.0;
+    float d = (vWorld.x + vWorld.y * 0.8) * 0.45 - (uTime - uSweepStart) * uSpeed + 2.0;
     float sheen = smoothstep(0.35, 0.0, abs(d)) * 0.55;
     vec3 tint = vec3(0.82, 0.92, 1.0);
     float a = uGlow * (0.012 + 0.2 * fres + sheen * 0.35);
@@ -476,6 +477,13 @@ const glassFrag = /* glsl */ `
   }
 `
 const noRaycast = () => {}
+
+// the idle "clickable" hint on the extra spots: glow length, pause before the next one, peak
+// brightness (hover = 1) and the slower speed of the light band
+const TEASE_LEN = 3.2
+const TEASE_GAP = 2.8
+const TEASE_PEAK = 0.55
+const TEASE_SPEED = 0.9
 
 function SectionGlass({
   hotspots,
@@ -500,6 +508,7 @@ function SectionGlass({
             uGlow: { value: 0 },
             uTime: { value: 0 },
             uSweepStart: { value: -10 },
+            uSpeed: { value: 2.2 },
             uInflate: { value: 0 },
           },
           transparent: true,
@@ -526,7 +535,7 @@ function SectionGlass({
         // the click / hover area: an invisible box around the whole section
         const hit = new THREE.BoxGeometry(...h.box.getSize(new THREE.Vector3()).addScalar(0.16).toArray())
         const center = h.box.getCenter(new THREE.Vector3())
-        return { h, material, shells, hit, center, glow: 0, wasOn: false, shown: false }
+        return { h, material, shells, hit, center, glow: 0, wasOn: false, shown: false, teaseAt: -100 }
       }),
     [hotspots],
   )
@@ -540,20 +549,42 @@ function SectionGlass({
     [sections],
   )
 
+  // Hint that the extra spots (memos) are clickable: in the lobby, one at a time lights up with
+  // a soft glass glow and a slow band of light, then the next one takes its turn.
+  const extras = useMemo(() => sections.filter((s) => s.h.link.startsWith('#') && s.h.link !== '#music'), [sections])
+  const tease = useRef({ next: 3, i: 0 })
+
   useFrame(({ clock }, dt) => {
     const t = clock.elapsedTime
     const k = 1 - Math.exp(-dt * 9)
+    const lobby = current === '/' && hovered === null
+    if (!lobby) tease.current.next = Math.max(tease.current.next, t + 2.5) // calm pause after hovering / memos
+    else if (t >= tease.current.next && extras.length) {
+      const s = extras[tease.current.i++ % extras.length]
+      s.teaseAt = t
+      // time the band so it crosses the middle of the object at the peak of the glow
+      const u = s.material.uniforms
+      u.uSpeed.value = TEASE_SPEED
+      u.uSweepStart.value = t + TEASE_LEN / 2 - ((s.center.x + s.center.y * 0.8) * 0.45 + 2.0) / TEASE_SPEED
+      tease.current.next = t + TEASE_LEN + TEASE_GAP
+    }
     for (const s of sections) {
       const on = s.h.link === hovered
-      if (on && !s.wasOn) s.material.uniforms.uSweepStart.value = t // replay the sheen
+      if (on && !s.wasOn) {
+        s.material.uniforms.uSpeed.value = 2.2
+        s.material.uniforms.uSweepStart.value = t // replay the sheen
+        s.teaseAt = -100
+      }
       s.wasOn = on
       s.glow += ((on ? 1 : 0) - s.glow) * k
       if (!on && s.glow < 0.003) s.glow = 0
+      const p = (t - s.teaseAt) / TEASE_LEN
+      const teaseGlow = !on && lobby && p >= 0 && p <= 1 ? TEASE_PEAK * Math.pow(Math.sin(Math.PI * p), 1.5) : 0
       const u = s.material.uniforms
-      u.uGlow.value = s.glow
+      u.uGlow.value = Math.max(s.glow, teaseGlow)
       u.uTime.value = t
-      u.uInflate.value = 0.004 + 0.008 * s.glow // swells out slightly as it fades in
-      const show = s.glow > 0
+      u.uInflate.value = 0.004 + 0.008 * u.uGlow.value // swells out slightly as it fades in
+      const show = u.uGlow.value > 0
       if (show !== s.shown) {
         s.shown = show
         for (const sh of s.shells) sh.visible = show // idle sections cost nothing to draw
@@ -625,6 +656,8 @@ function SectionBubbles({
           const icon = h.link === '#music' ? '♪' : '!'
           a.innerHTML = `<span class="section-bubble-inner"><i class="section-bubble-info">${icon}</i></span>`
           if (h.link === '#music') a.setAttribute('aria-label', 'Play or mute music')
+          // the "!" signs are hidden; they only appear for keyboard users tabbing to them
+          else a.classList.add('is-silent')
         } else {
           a.innerHTML = '<span class="section-bubble-inner"><i class="section-bubble-dot"></i><b></b><em>→</em></span>'
           a.querySelector('b')!.textContent = h.label

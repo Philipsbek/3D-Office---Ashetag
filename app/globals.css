@@ -480,6 +480,8 @@ sup.counter {
   transition: opacity .25s;
 }
 .section-bubble.is-hidden, .section-bubble.is-behind { opacity: 0; pointer-events: none; }
+/* extra spots: no visible sign; it shows only while a keyboard user has tabbed onto it */
+.section-bubble.is-silent:not(:focus-visible) { opacity: 0; pointer-events: none; }
 .section-bubble-inner {
   position: absolute; left: 0; bottom: 10px; /* the tail's tip sits on the 3D point */
   display: inline-flex; align-items: center; gap: 6px;
