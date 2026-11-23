@@ -54,25 +54,3 @@ export function useDayPhase(): Palette {
   return PALETTES[phase]
 }
 
-/**
- * Occasional neon rain: about 3 hours in 10 (the same for everyone in a given hour).
- * Override for testing: ?weather=rain | clear
- */
-export function useRain(): boolean {
-  const pick = () => {
-    if (typeof window === 'undefined') return false
-    const w = new URLSearchParams(window.location.search).get('weather')
-    if (w === 'rain') return true
-    if (w === 'clear') return false
-    const d = new Date()
-    const hourOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 1).getTime()) / 3_600_000)
-    const x = Math.sin(hourOfYear * 12.9898 + d.getFullYear() * 78.233) * 43758.5453
-    return x - Math.floor(x) < 0.3
-  }
-  const [rain, setRain] = useState(pick)
-  useEffect(() => {
-    const id = setInterval(() => setRain(pick()), 60_000)
-    return () => clearInterval(id)
-  }, [])
-  return rain
-}

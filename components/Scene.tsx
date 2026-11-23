@@ -23,7 +23,7 @@ import { arcadeBus } from './arcadeBus'
 import { memoBus, useOpenMemo } from './memoBus'
 import { LOW_POWER } from './perf'
 import { music } from './music'
-import { useDayPhase, useRain } from './daytime'
+import { useDayPhase } from './daytime'
 import { site } from '@/content/site'
 import { markReady, setExpectedBytes, trackProgress } from './loadProgress'
 import Loader from './Loader'
@@ -41,9 +41,7 @@ const DRACO_URL = '/draco/' // decoder copied from three/examples/jsm/libs/draco
 
 export default function Scene() {
   const day = useDayPhase() // the city follows the visitor's clock (night / dawn / day / dusk)
-  const rain = useRain() // occasional neon rain
-  // rain: a heavier, greyer haze that closes in a little
-  const haze = rain ? new THREE.Color(day.horizon).lerp(new THREE.Color('#2a2f45'), 0.35).getStyle() : day.horizon
+  const haze = day.horizon
   return (
     <div className="scene">
       <Canvas
@@ -56,9 +54,8 @@ export default function Scene() {
       >
         <color attach="background" args={[SHOW_CITY ? haze : '#000000']} />
         {/* city haze in the time-of-day colour; it only starts past the office so the room stays crisp */}
-        <fog attach="fog" args={SHOW_CITY ? [haze, 40, rain ? day.fogFar * 0.75 : day.fogFar] : ['#000000', 24, 48]} />
-        {SHOW_CITY && <CityScape day={{ ...day, horizon: haze }} rain={rain} />}
-        {rain && <WindowRain />}
+        <fog attach="fog" args={SHOW_CITY ? [haze, 40, day.fogFar] : ['#000000', 24, 48]} />
+        {SHOW_CITY && <CityScape day={day} />}
         <Lights ambient={day.ambient} />
         <Sun sun={day.sun} />
         <Suspense fallback={null}>
@@ -1174,54 +1171,3 @@ function Sun({ sun }: { sun: { color: string; intensity: number; elevation: numb
   return <directionalLight position={[60, 20 + 140 * e, 80]} intensity={sun.intensity} color={sun.color} />
 }
 
-
-/** Rain running down the big Services window (only while it rains): a drifting texture of
- * droplets and trails on a sheet just inside the glass. */
-function WindowRain() {
-  const { tex, mat } = useMemo(() => {
-    const c = document.createElement('canvas')
-    c.width = 512
-    c.height = 512
-    const g = c.getContext('2d')!
-    let seed = 3
-    const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
-    for (let k = 0; k < 70; k++) {
-      // a trail with a bead of water at its foot
-      const x = r() * 512, y = r() * 512, len = 30 + r() * 120, w = 1 + r() * 1.6
-      const grad = g.createLinearGradient(x, y - len, x, y)
-      grad.addColorStop(0, 'rgba(190,225,255,0)')
-      grad.addColorStop(1, 'rgba(190,225,255,0.35)')
-      g.strokeStyle = grad
-      g.lineWidth = w
-      g.beginPath()
-      g.moveTo(x, y - len)
-      g.quadraticCurveTo(x + (r() - 0.5) * 8, y - len / 2, x, y)
-      g.stroke()
-      g.fillStyle = 'rgba(220,240,255,0.55)'
-      g.beginPath()
-      g.arc(x, y, w * 1.6, 0, Math.PI * 2)
-      g.fill()
-    }
-    for (let k = 0; k < 240; k++) {
-      // small static droplets
-      g.fillStyle = `rgba(210,235,255,${0.15 + r() * 0.3})`
-      g.beginPath()
-      g.arc(r() * 512, r() * 512, 0.6 + r() * 1.4, 0, Math.PI * 2)
-      g.fill()
-    }
-    const t = new THREE.CanvasTexture(c)
-    t.wrapS = t.wrapT = THREE.RepeatWrapping
-    t.repeat.set(2.3, 1)
-    const m = new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0.5 })
-    return { tex: t, mat: m }
-  }, [])
-  useFrame((_, dt) => {
-    tex.offset.y += dt * 0.06 // the trails slide down the glass
-  })
-  // the big window: x 1.8..6.4, y 4..6, glass just in front of the back wall (z = -6.15)
-  return (
-    <mesh position={[4.1, 5.0, -6.12]} material={mat} renderOrder={6}>
-      <planeGeometry args={[4.6, 2.0]} />
-    </mesh>
-  )
-}
