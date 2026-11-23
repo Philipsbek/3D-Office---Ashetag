@@ -22,10 +22,12 @@ import { ArcadeGame, type ArcadeTile } from './arcadeGame'
 import { arcadeBus } from './arcadeBus'
 import { memoBus, useOpenMemo } from './memoBus'
 import { LOW_POWER } from './perf'
+import { music } from './music'
+import { useDayPhase, useRain } from './daytime'
 import { site } from '@/content/site'
 import { markReady, setExpectedBytes, trackProgress } from './loadProgress'
 import Loader from './Loader'
-import CityScape, { CITY_HAZE } from './CityScape'
+import CityScape from './CityScape'
 
 // The city outside the windows (components/CityScape.tsx). Set to false to go back to a black void.
 const SHOW_CITY = true
@@ -38,6 +40,10 @@ setExpectedBytes(MODEL_BYTES)
 const DRACO_URL = '/draco/' // decoder copied from three/examples/jsm/libs/draco/gltf
 
 export default function Scene() {
+  const day = useDayPhase() // the city follows the visitor's clock (night / dawn / day / dusk)
+  const rain = useRain() // occasional neon rain
+  // rain: a heavier, greyer haze that closes in a little
+  const haze = rain ? new THREE.Color(day.horizon).lerp(new THREE.Color('#2a2f45'), 0.35).getStyle() : day.horizon
   return (
     <div className="scene">
       <Canvas
@@ -45,11 +51,13 @@ export default function Scene() {
         dpr={LOW_POWER ? [1, 1.25] : [1, 2]} // phones draw at about their real resolution, not 2x
         camera={{ fov: 50, position: [1, 3.2, 10], near: 0.05, far: 1200 }}
       >
-        <color attach="background" args={[SHOW_CITY ? CITY_HAZE : '#000000']} />
-        {/* purple-magenta city haze; it only starts past the office so the room stays crisp */}
-        <fog attach="fog" args={SHOW_CITY ? [CITY_HAZE, 40, 470] : ['#000000', 24, 48]} />
-        {SHOW_CITY && <CityScape />}
-        <Lights />
+        <color attach="background" args={[SHOW_CITY ? haze : '#000000']} />
+        {/* city haze in the time-of-day colour; it only starts past the office so the room stays crisp */}
+        <fog attach="fog" args={SHOW_CITY ? [haze, 40, rain ? day.fogFar * 0.75 : day.fogFar] : ['#000000', 24, 48]} />
+        {SHOW_CITY && <CityScape day={{ ...day, horizon: haze }} rain={rain} />}
+        {rain && <WindowRain />}
+        <Lights ambient={day.ambient} />
+        <Sun sun={day.sun} />
         <Suspense fallback={null}>
           <Office />
           <MarkReadyAfterFirstFrames />
@@ -131,10 +139,19 @@ function Office() {
       spot.userData.link = `#${id}`
       spot.userData.label = site.memos[id]?.name ?? id
     }
+    const boom = scene.getObjectByName('BoomboxSpot') // click to switch the music on / off
+    if (boom) {
+      boom.userData.link = '#music'
+      boom.userData.label = 'Music'
+    }
   }, [scene])
+  useBoomboxPulse(scene)
   const hotspots = useHotspots(scene)
   // "/lab" flies the camera there; "#nap" opens that memo
-  const go = (link: string) => (link.startsWith('#') ? memoBus.open(link.slice(1)) : router.push(link))
+  const go = (link: string) => {
+    if (link === '#music') return music.toggle()
+    return link.startsWith('#') ? memoBus.open(link.slice(1)) : router.push(link)
+  }
   useHoverGlow(hotspots, hovered && !isHere ? hovered.root : null)
   useChromaWave(scene)
   useFanSpin(scene)
@@ -600,7 +617,9 @@ function SectionBubbles({
           // extra bits (memos etc.): just a small round "!" sign, no name
           a.classList.add('is-extra')
           a.setAttribute('aria-label', `More about ${h.label}`)
-          a.innerHTML = '<span class="section-bubble-inner"><i class="section-bubble-info">!</i></span>'
+          const icon = h.link === '#music' ? '♪' : '!'
+          a.innerHTML = `<span class="section-bubble-inner"><i class="section-bubble-info">${icon}</i></span>`
+          if (h.link === '#music') a.setAttribute('aria-label', 'Play or mute music')
         } else {
           a.innerHTML = '<span class="section-bubble-inner"><i class="section-bubble-dot"></i><b></b><em>→</em></span>'
           a.querySelector('b')!.textContent = h.label
@@ -994,12 +1013,12 @@ const POINT_LIGHTS = [
 // phone mode keeps only the strongest zone lights (the neon strips glow on their own anyway)
 const PHONE_LIGHTS = [...POINT_LIGHTS].sort((x, y) => y.intensity - x.intensity).slice(0, 8)
 
-function Lights() {
+function Lights({ ambient = 1 }: { ambient?: number }) {
   // Only the window light casts shadows (and only on desktop), to keep it fast.
   const list = LOW_POWER ? PHONE_LIGHTS : POINT_LIGHTS
   return (
     <>
-      <hemisphereLight args={['#4a5a78', '#120a0e', LOW_POWER ? 0.5 : 0.35]} />
+      <hemisphereLight args={['#4a5a78', '#120a0e', (LOW_POWER ? 0.5 : 0.35) * ambient]} />
       <WindowLight />
       {list.map((l, i) => (
         <pointLight key={i} position={l.pos} intensity={LOW_POWER ? l.intensity * 1.15 : l.intensity} color={l.color} />
@@ -1119,4 +1138,82 @@ function PerfLog() {
     }
   })
   return null
+}
+
+
+/** The boombox bounces a little on every beat while the music plays. */
+function useBoomboxPulse(scene: THREE.Object3D) {
+  const box = useMemo(() => scene.getObjectByName('BoomboxSpot') ?? null, [scene])
+  const kick = useRef(0)
+  const base = useMemo(() => box?.scale.clone() ?? new THREE.Vector3(1, 1, 1), [box])
+  useEffect(() => music.on((e) => {
+    if (e.beat !== undefined) kick.current = 1
+  }), [])
+  useFrame((_, dt) => {
+    if (!box) return
+    kick.current = Math.max(0, kick.current - dt * 5)
+    const k = 1 + 0.07 * kick.current * kick.current
+    box.scale.set(base.x * k, base.y * (1 + 0.1 * kick.current * kick.current), base.z * k)
+  })
+}
+
+
+/** Daylight for dawn / day / dusk: a sun low in the sky behind the camera's right shoulder
+ * (none at night, when the office is lit by its own neon). */
+function Sun({ sun }: { sun: { color: string; intensity: number; elevation: number } }) {
+  if (!sun.intensity) return null
+  const e = sun.elevation
+  return <directionalLight position={[60, 20 + 140 * e, 80]} intensity={sun.intensity} color={sun.color} />
+}
+
+
+/** Rain running down the big Services window (only while it rains): a drifting texture of
+ * droplets and trails on a sheet just inside the glass. */
+function WindowRain() {
+  const { tex, mat } = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = 512
+    c.height = 512
+    const g = c.getContext('2d')!
+    let seed = 3
+    const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+    for (let k = 0; k < 70; k++) {
+      // a trail with a bead of water at its foot
+      const x = r() * 512, y = r() * 512, len = 30 + r() * 120, w = 1 + r() * 1.6
+      const grad = g.createLinearGradient(x, y - len, x, y)
+      grad.addColorStop(0, 'rgba(190,225,255,0)')
+      grad.addColorStop(1, 'rgba(190,225,255,0.35)')
+      g.strokeStyle = grad
+      g.lineWidth = w
+      g.beginPath()
+      g.moveTo(x, y - len)
+      g.quadraticCurveTo(x + (r() - 0.5) * 8, y - len / 2, x, y)
+      g.stroke()
+      g.fillStyle = 'rgba(220,240,255,0.55)'
+      g.beginPath()
+      g.arc(x, y, w * 1.6, 0, Math.PI * 2)
+      g.fill()
+    }
+    for (let k = 0; k < 240; k++) {
+      // small static droplets
+      g.fillStyle = `rgba(210,235,255,${0.15 + r() * 0.3})`
+      g.beginPath()
+      g.arc(r() * 512, r() * 512, 0.6 + r() * 1.4, 0, Math.PI * 2)
+      g.fill()
+    }
+    const t = new THREE.CanvasTexture(c)
+    t.wrapS = t.wrapT = THREE.RepeatWrapping
+    t.repeat.set(2.3, 1)
+    const m = new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0.5 })
+    return { tex: t, mat: m }
+  }, [])
+  useFrame((_, dt) => {
+    tex.offset.y += dt * 0.06 // the trails slide down the glass
+  })
+  // the big window: x 1.8..6.4, y 4..6, glass just in front of the back wall (z = -6.15)
+  return (
+    <mesh position={[4.1, 5.0, -6.12]} material={mat} renderOrder={6}>
+      <planeGeometry args={[4.6, 2.0]} />
+    </mesh>
+  )
 }

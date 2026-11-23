@@ -5,6 +5,7 @@ import Nav from '@/components/Nav'
 import SectionNav from '@/components/SectionNav'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import Memo from '@/components/Memo'
+import MusicToggle from '@/components/MusicToggle'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], weight: ['500', '600'], variable: '--font-geist' })
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main>{children}</main>
         <SectionNav />
+        <MusicToggle />
         <WhatsAppButton />
         <Memo />
       </body>

@@ -15,10 +15,13 @@ import { Suspense, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { LOW_POWER } from './perf'
+import type { Palette } from './daytime'
 
 const GROUND = 36
 /** The night haze: distant things fade into it and it is the sky's glowing horizon. */
 export const CITY_HAZE = '#3a1a4c'
+/** The city reflection snapshot (made by TowerBase), reused for wet streets in the rain. */
+const cityEnv: { tex: THREE.Texture | null } = { tex: null }
 const ORIGIN = new THREE.Vector2(0.8, -1.0) // centre of the condo tower (x, z)
 // horizontal direction the lobby camera looks in (camera -> target)
 const VIEW = new THREE.Vector2(-0.623, -0.782).normalize()
@@ -184,6 +187,7 @@ function useCityModels() {
           // daylight concrete/tile greys become night slate with a hint of violet
           if (hsl.s < 0.2 && !src.map) color.setHSL(0.74, 0.22, hsl.l * 0.55)
           material = new THREE.MeshBasicMaterial({ name: src.name, color, map: src.map ?? null, vertexColors: true, side: src.side })
+          material.userData.baseColor = color.clone() // time of day scales this
         }
         parts.push({ geometry, material, paint: src.name.includes('CarPaint') })
       })
@@ -233,8 +237,15 @@ function ModelInstances({ parts, matrices, count, colors, live }: { parts: Model
   )
 }
 
-function StreetBuildings({ list }: { list: Placement[] }) {
+function StreetBuildings({ list, brightness = 1 }: { list: Placement[]; brightness?: number }) {
   const { buildings, buildingsFar } = useCityModels()
+  // time of day: unlit buildings read brighter by day (their own colour x brightness)
+  useEffect(() => {
+    for (const p of [...buildings.flat(), ...buildingsFar.flat()]) {
+      const base = p.material.userData.baseColor as THREE.Color | undefined
+      if (base) (p.material as THREE.MeshBasicMaterial).color.copy(base).multiplyScalar(brightness)
+    }
+  }, [buildings, buildingsFar, brightness])
   // each model twice: detailed copies near the office, simplified ones further out
   const groups = useMemo(() => {
     const out: { parts: ModelPart[]; count: number; matrices: Float32Array; key: string }[] = []
@@ -287,6 +298,7 @@ function TowerBase() {
       g.visible = false // don't reflect the tower in itself
       cam.update(gl, scene)
       g.visible = true
+      cityEnv.tex = rt.texture
       ;[...tower, ...buildings.flat(), ...buildingsFar.flat()].forEach((p) => {
         if (p.material.name !== 'Loft_MinDarkGlass') return
         const m = p.material as THREE.MeshStandardMaterial
@@ -456,8 +468,24 @@ function useHeadlightParts(car: ModelPart[]): ModelPart[] {
 }
 
 /** Streets, crossroads, lamps, traffic lights and traffic for the whole grid. */
-function StreetGrid() {
+function StreetGrid({ rain = false }: { rain?: boolean }) {
   const { street, crossroads, signal, lamps, car } = useCityModels()
+  // rain: the tarmac goes glossy and reflects the neon (once the reflection snapshot exists)
+  const wetDone = useRef<boolean | null>(null)
+  useFrame(() => {
+    if (wetDone.current === rain || (rain && !cityEnv.tex)) return
+    for (const p of [...street, ...crossroads]) {
+      const m = p.material as THREE.MeshStandardMaterial
+      if (!m.isMeshStandardMaterial) continue
+      if (m.userData.dry === undefined) m.userData.dry = { r: m.roughness, mt: m.metalness }
+      m.roughness = rain ? Math.min(m.roughness, 0.16) : m.userData.dry.r
+      m.metalness = rain ? Math.max(m.metalness, 0.55) : m.userData.dry.mt
+      m.envMap = rain ? cityEnv.tex : null
+      m.envMapIntensity = 1.3
+      m.needsUpdate = true
+    }
+    wetDone.current = rain
+  })
   const headlights = useHeadlightParts(car)
   const Y = -GROUND + 0.03
 
@@ -746,7 +774,7 @@ function Drones() {
  * where the neon lights up the haze, darkening toward the top, with a few stars.
  * The horizon colour IS the scene haze (CITY_HAZE, also used for the fog in Scene.tsx),
  * so distant streets fade straight into the glow with no seam. */
-function Sky() {
+function Sky({ day }: { day: Palette }) {
   const mat = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -754,14 +782,14 @@ function Sky() {
         depthWrite: false,
         fog: false,
         // THREE.Color keeps linear values, the same space the fog is applied in
-        uniforms: { horizon: { value: new THREE.Color(CITY_HAZE) } },
+        uniforms: { horizon: { value: new THREE.Color(CITY_HAZE) }, top: { value: new THREE.Color('#020208') } },
         vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
         fragmentShader: `uniform vec3 horizon;
+          uniform vec3 top;
           varying vec3 vDir;
           void main(){
             float y = vDir.y;
-            vec3 mid = horizon * 0.22;
-            vec3 top = vec3(0.002, 0.002, 0.007);
+            vec3 mid = mix(horizon * 0.22, top, 0.55);
             vec3 c = mix(horizon, mid, smoothstep(0.0, 0.22, y));
             c = mix(c, top, smoothstep(0.22, 0.7, y));
             gl_FragColor = vec4(y < 0.0 ? horizon : c, 1.0); // below the horizon: pure haze
@@ -815,32 +843,89 @@ function Sky() {
     const dir = new THREE.Vector3(VIEW.x, 0.42, VIEW.y).normalize().multiplyScalar(900)
     return { m, pos: dir }
   }, [])
+  useEffect(() => {
+    mat.uniforms.horizon.value.set(day.horizon)
+    mat.uniforms.top.value.set(day.top)
+  }, [mat, day])
   return (
     <group>
       <mesh material={mat} renderOrder={-3}>
         <sphereGeometry args={[950, 32, 16]} />
       </mesh>
       <points geometry={stars} renderOrder={-2}>
-        <pointsMaterial color="#e6dcff" size={1.4} sizeAttenuation={false} fog={false} transparent opacity={0.6} />
+        <pointsMaterial color="#e6dcff" size={1.4} sizeAttenuation={false} fog={false} transparent opacity={day.stars} visible={day.stars > 0} />
       </points>
-      <sprite material={moon.m} position={moon.pos} scale={[170, 170, 1]} renderOrder={-2} />
+      {day.moon && <sprite material={moon.m} position={moon.pos} scale={[170, 170, 1]} renderOrder={-2} />}
     </group>
   )
 }
 
-export default function CityScape() {
+export default function CityScape({ day, rain = false }: { day: Palette; rain?: boolean }) {
   const buildings = useLayout()
   return (
     <group>
-      <Sky />
+      <Sky day={day} />
       <Ground />
       <Suspense fallback={null}>
         <TowerBase />
-        {SHOW_BUILDINGS && <StreetBuildings list={buildings} />}
-        <StreetGrid />
+        {SHOW_BUILDINGS && <StreetBuildings list={buildings} brightness={day.city} />}
+        <StreetGrid rain={rain} />
       </Suspense>
+      {rain && <Rain />}
       <Weather />
       <Drones />
     </group>
   )
+}
+
+
+/** Neon rain: thin falling streaks around the office tower and over the streets (never inside
+ * the office). Animated entirely on the GPU, so it costs almost nothing per frame. */
+function Rain() {
+  const { geom, mat } = useMemo(() => {
+    const r = rng(17)
+    const n = LOW_POWER ? 1400 : 3600
+    const pos: number[] = []
+    const seed: number[] = []
+    const Y0 = -GROUND - 2, H = GROUND + 34 // from just above the street up past the office roof
+    let made = 0
+    while (made < n) {
+      const x = ORIGIN.x + (r() - 0.5) * 120
+      const z = ORIGIN.y + (r() - 0.5) * 120
+      // keep the office (and the camera's view through its cut-away walls) dry
+      if (x > -8 && x < 9.5 && z > -7 && z < 5) continue
+      const y = Y0 + r() * H
+      const sp = 0.8 + r() * 0.4
+      for (const end of [0, 1]) {
+        pos.push(x, y, z)
+        seed.push(end, sp, Y0, H)
+      }
+      made++
+    }
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+    g.setAttribute('seed', new THREE.Float32BufferAttribute(seed, 4))
+    const m = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: { t: { value: 0 } },
+      vertexShader: `attribute vec4 seed; uniform float t; varying float vEnd;
+        void main(){
+          vec3 p = position;
+          float y = mod(p.y - t * 26.0 * seed.y - seed.z, seed.w) + seed.z;
+          p.y = y + seed.x * 1.4;   // top end of each streak 1.4 m above the bottom
+          p.x += seed.x * 0.08;     // a slight slant (wind)
+          vEnd = seed.x;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+        }`,
+      fragmentShader: `varying float vEnd;
+        void main(){ gl_FragColor = vec4(0.62, 0.86, 1.0, 0.12 + 0.38 * vEnd); }`,
+    })
+    return { geom: g, mat: m }
+  }, [])
+  useFrame(({ clock }) => {
+    mat.uniforms.t.value = clock.elapsedTime
+  })
+  return <lineSegments geometry={geom} material={mat} frustumCulled={false} renderOrder={5} />
 }
