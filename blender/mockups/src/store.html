@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+  body { --accent: #b6ff3b; --glow1: rgba(182,255,59,.10); --glow2: rgba(34,228,255,.14); --frameglow: rgba(182,255,59,.10); }
+  .page { background: #0a0910; }
+  .nav { padding-right: 120px; } .nav .cart { border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 6px 14px; color: #fff; }
+  .nav .cart b { color: #b6ff3b; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; padding: 8px 120px 16px 36px; }
+  h1 { font-size: 44px; letter-spacing: -.04em; font-weight: 700; color: #fff; line-height: 1; margin-top: 8px; }
+  .chips { display: flex; gap: 8px; }
+  .chips span { font-size: 13px; padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); color: #cfcbd9; }
+  .chips span.on { background: #fff; color: #0a0910; border-color: #fff; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 120px 0 36px; }
+  .card { border-radius: 14px; overflow: hidden; background: #14121c; border: 1px solid rgba(255,255,255,.08); }
+  .card .im { height: 186px; position: relative; overflow: hidden; background: #1b1a20; }
+  .card .im img { width: 100%; height: 100%; object-fit: cover; }
+  .card .tag { position: absolute; top: 10px; left: 10px; font: 600 11px 'Geist Mono', monospace; background: #b6ff3b; color: #0a0910; padding: 4px 8px; border-radius: 6px; }
+  .card .info { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; }
+  .card b { font-size: 15px; color: #fff; font-weight: 600; } .card small { display: block; font-size: 12px; color: #8c8898; margin-top: 2px; }
+  .card .p { font: 600 15px 'Geist Mono', monospace; color: #fff; }
+  /* phone: product page */
+  .m { height: 100%; background: #0a0910; padding-top: 44px; }
+  .m .top { display: flex; justify-content: space-between; padding: 0 20px 12px; font-weight: 700; font-size: 14px; }
+  .m .pimg { height: 250px; background: #1b1a20; }
+  .m .pimg img { width: 100%; height: 100%; object-fit: cover; object-position: 28% 50%; }
+  .m .c { padding: 16px 20px; }
+  .m h2 { font-size: 26px; letter-spacing: -.03em; color: #fff; line-height: 1.05; }
+  .m .pr { font: 600 18px 'Geist Mono', monospace; color: #b6ff3b; margin: 8px 0 12px; }
+  .m .opts { display: flex; gap: 8px; margin-bottom: 14px; }
+  .m .opts i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #0a0910; outline: 1px solid rgba(255,255,255,.3); }
+  .m .btn { display: block; text-align: center; }
+</style></head><body>
+<div class="browser">
+  <div class="chrome"><i></i><i></i><i></i><div class="url">loftgear.shop/setups</div></div>
+  <div class="page">
+    <div class="nav"><span class="logo">LOFTGEAR</span><span>Setups</span><span>Desks</span><span>Peripherals</span><span>Arcade</span><span class="cart">Cart <b>2</b></span></div>
+    <div class="head">
+      <div><div class="eyebrow">Shop · 24 products</div><h1>Build your night setup.</h1></div>
+      <div class="chips"><span class="on">All</span><span>Desks</span><span>Racing</span><span>Arcade</span></div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="im"><img src="keyboard.jpg" style="object-position:50% 50%;transform:scale(1.25)"><span class="tag">NEW</span></div><div class="info"><div><b>Prism K1 Keyboard</b><small>Per-key light</small></div><span class="p">$149</span></div></div>
+      <div class="card"><div class="im"><img src="sim_rig_dark.jpg" style="object-position:24% 55%;transform:scale(1.5)"><span class="tag">BEST SELLER</span></div><div class="info"><div><b>Apex Sim Rig</b><small>Triple-screen cockpit</small></div><span class="p">$1,290</span></div></div>
+      <div class="card"><div class="im"><img src="arcade_cabinets_dark.jpg" style="object-position:50% 40%;transform:scale(1.15)"></div><div class="info"><div><b>Retro Arcade Pair</b><small>Two classic cabinets</small></div><span class="p">$2,400</span></div></div>
+      <div class="card"><div class="im"><img src="desk.jpg" style="object-position:22% 50%;transform:scale(1.35);filter:brightness(.42) contrast(1.15)"></div><div class="info"><div><b>Battle Station Desk</b><small>Sit-stand, 160 cm</small></div><span class="p">$549</span></div></div>
+      <div class="card"><div class="im"><img src="mouse.jpg" style="transform:scale(1.3)"></div><div class="info"><div><b>Prism Mouse</b><small>Ring light, 26K DPI</small></div><span class="p">$79</span></div></div>
+      <div class="card"><div class="im"><img src="character.jpg" style="object-position:92% 60%;transform:scale(1.3)"><span class="tag">LIMITED</span></div><div class="info"><div><b>Hoodie Figure</b><small>Collector's edition</small></div><span class="p">$39</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="phone"><div class="screen"><div class="notch"></div>
+  <div class="m">
+    <div class="top"><span>←</span><span>LOFTGEAR</span><span>♡</span></div>
+    <div class="pimg"><img src="sim_rig_dark.jpg"></div>
+    <div class="c">
+      <div class="eyebrow">Racing · In stock</div>
+      <h2 style="margin-top:8px">Apex Sim Rig</h2>
+      <div class="pr">$1,290</div>
+      <div class="opts"><i style="background:#22e4ff"></i><i style="background:#ff4fd8"></i><i style="background:#b6ff3b"></i></div>
+      <span class="btn primary">Add to cart</span>
+    </div>
+  </div>
+</div></div>
+</body></html>

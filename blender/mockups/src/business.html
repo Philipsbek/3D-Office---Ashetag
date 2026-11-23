@@ -1,0 +1,66 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+  body { --accent: #ff4fd8; --glow1: rgba(255,79,216,.16); --glow2: rgba(255,60,60,.14); --frameglow: rgba(255,79,216,.14); }
+  .page { background: #0a0910; }
+  .hero { position: relative; height: 430px; }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+  .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,9,16,.95) 0%, rgba(10,9,16,.6) 40%, transparent 70%), linear-gradient(0deg, #0a0910 0%, transparent 30%); }
+  .hero .nav { position: relative; z-index: 2; }
+  .hero .copy { position: absolute; z-index: 2; left: 56px; top: 110px; width: 480px; }
+  h1 { font-size: 62px; line-height: .92; letter-spacing: -.045em; font-weight: 700; color: #fff; margin: 14px 0 16px; }
+  .lead { font-size: 16px; line-height: 1.45; color: #c9c4d4; margin-bottom: 24px; max-width: 400px; }
+  .rating { margin-top: 18px; font-size: 13px; color: #b9b4c6; } .rating b { color: #febc2e; letter-spacing: 2px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr 1.25fr; gap: 14px; padding: 6px 120px 0 56px; }
+  .svc { border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 18px; background: rgba(255,255,255,.025); height: 200px; display: flex; flex-direction: column; }
+  .svc .ic { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,79,216,.14); color: #ff4fd8; display: grid; place-items: center; font-weight: 700; margin-bottom: auto; }
+  .svc b { font-size: 18px; color: #fff; letter-spacing: -.02em; margin-bottom: 6px; } .svc small { font-size: 13px; color: #8c8898; line-height: 1.4; }
+  .svc.pic { padding: 0; overflow: hidden; position: relative; }
+  .svc.pic img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+  .svc.pic span { position: absolute; left: 14px; bottom: 12px; font-size: 13px; font-weight: 600; background: rgba(10,9,16,.75); padding: 6px 10px; border-radius: 8px; }
+  /* phone */
+  .m { height: 100%; background: #0a0910; }
+  .m .pimg { height: 300px; position: relative; }
+  .m .pimg img { width: 100%; height: 100%; object-fit: cover; object-position: 52% 55%; }
+  .m .pimg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #0a0910 5%, transparent 50%); }
+  .m .top { position: absolute; z-index: 3; top: 44px; left: 20px; right: 20px; display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; }
+  .m .c { padding: 0 20px; margin-top: -40px; position: relative; z-index: 2; }
+  .m h2 { font-size: 32px; line-height: .95; letter-spacing: -.04em; color: #fff; margin: 8px 0 14px; }
+  .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .slots span { border: 1px solid rgba(255,255,255,.14); border-radius: 10px; text-align: center; padding: 9px 0; font: 600 12px 'Geist Mono', monospace; color: #cfcbd9; }
+  .slots span.on { background: #ff4fd8; color: #0a0910; border-color: #ff4fd8; }
+  .m .btn { display: block; text-align: center; }
+</style></head><body>
+<div class="browser">
+  <div class="chrome"><i></i><i></i><i></i><div class="url">neonmotors.city</div></div>
+  <div class="page">
+    <div class="hero"><img src="city_car_hero.jpg">
+      <div class="nav" style="padding-right:120px"><span class="logo">NEON MOTORS</span><span>Services</span><span>Garage</span><span>About</span><span>Contact</span></div>
+      <div class="copy">
+        <div class="eyebrow">Open late · Downtown garage</div>
+        <h1>Night-shift car care for the city.</h1>
+        <p class="lead">Servicing, detailing and custom light kits — book a slot online and pick up before sunrise.</p>
+        <span class="btn primary">Book a service</span>&nbsp;&nbsp;<span class="btn ghost">See prices</span>
+        <div class="rating"><b>★★★★★</b>&nbsp; 4.9 from 312 local reviews</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="svc"><div class="ic">01</div><b>Full service</b><small>Oil, brakes, tyres and a 40-point check.</small></div>
+      <div class="svc"><div class="ic">02</div><b>Detailing</b><small>Hand wash, polish and interior deep clean.</small></div>
+      <div class="svc"><div class="ic">03</div><b>Light kits</b><small>Underglow and light bars, fitted same night.</small></div>
+      <div class="svc pic"><img src="neon_alley.jpg"><span>Visit the garage →</span></div>
+    </div>
+  </div>
+</div>
+<div class="phone"><div class="screen"><div class="notch"></div>
+  <div class="m">
+    <div class="top"><span>NEON MOTORS</span><span style="color:#ff4fd8">☰</span></div>
+    <div class="pimg"><img src="neon_alley.jpg"></div>
+    <div class="c">
+      <div class="eyebrow">Book online</div>
+      <h2>Pick a slot tonight.</h2>
+      <div class="slots"><span>20:00</span><span class="on">21:30</span><span>23:00</span><span>00:30</span><span>02:00</span><span>03:30</span></div>
+      <span class="btn primary">Confirm 21:30</span>
+    </div>
+  </div>
+</div></div>
+</body></html>

@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css">
+<style>
+  body { --accent: #22e4ff; --glow1: rgba(34,228,255,.18); --glow2: rgba(160,90,255,.18); }
+  .page { background: radial-gradient(800px 500px at 70% 55%, rgba(120,60,255,.25), transparent 70%), #0a0910; }
+  .hero { display: grid; grid-template-columns: 430px 1fr; align-items: center; padding: 30px 0 0 56px; height: 470px; }
+  h1 { font-size: 76px; line-height: .9; letter-spacing: -.045em; font-weight: 700; color: #fff; margin: 16px 0 18px; }
+  h1 span { background: linear-gradient(90deg, #22e4ff, #a78bff, #ff4fd8); -webkit-background-clip: text; color: transparent; }
+  .lead { font-size: 17px; line-height: 1.45; color: #b9b4c6; max-width: 360px; margin-bottom: 26px; }
+  .price { margin-top: 22px; font: 500 13px 'Geist Mono', monospace; color: #8c8898; }
+  .price b { color: #fff; font-size: 15px; }
+  .shot { position: relative; height: 430px; margin-right: -40px; }
+  .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%;
+    -webkit-mask-image: radial-gradient(ellipse 60% 62% at 50% 50%, #000 55%, transparent 100%); filter: saturate(1.15) contrast(1.08); }
+  .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0 56px; }
+  .feat { border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 18px; background: rgba(255,255,255,.025); }
+  .feat b { display: block; font-size: 26px; letter-spacing: -.03em; color: #fff; }
+  .feat small { font-size: 13px; color: #8c8898; }
+  .feat.media { padding: 0; overflow: hidden; position: relative; }
+  .feat.media img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; }
+  .feat.media span { position: absolute; left: 14px; bottom: 12px; font-size: 13px; font-weight: 600; }
+  /* phone */
+  .m { padding: 46px 20px 20px; height: 100%; background: radial-gradient(300px 300px at 50% 45%, rgba(120,60,255,.3), transparent 70%), #0a0910; }
+  .m .top { display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; margin-bottom: 20px; }
+  .m h2 { font-size: 40px; line-height: .92; letter-spacing: -.04em; color: #fff; margin: 10px 0 12px; }
+  .m h2 span { background: linear-gradient(90deg, #22e4ff, #ff4fd8); -webkit-background-clip: text; color: transparent; }
+  .m p { font-size: 13px; color: #b9b4c6; line-height: 1.4; }
+  .m .pimg { height: 230px; margin: 10px -20px; }
+  .m .pimg img { width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 50%, transparent 100%); }
+  .m .btn { display: block; text-align: center; margin-top: 8px; }
+</style></head><body>
+<div class="browser">
+  <div class="chrome"><i></i><i></i><i></i><div class="url">prism-k1.com</div></div>
+  <div class="page">
+    <div class="nav" style="padding-right:120px"><span class="logo">PRISM</span><span>Features</span><span>Specs</span><span>Reviews</span><span class="btn primary" style="padding:8px 16px">Pre-order</span></div>
+    <div class="hero">
+      <div>
+        <div class="eyebrow">New · Mechanical keyboard</div>
+        <h1>Every key,<br><span>alive.</span></h1>
+        <p class="lead">Per-key light that ripples as you type, hot-swap switches and an aluminium frame built to last.</p>
+        <span class="btn primary">Pre-order now</span>&nbsp;&nbsp;<span class="btn ghost">Watch the film</span>
+        <div class="price">From <b>$149</b> · Ships in December</div>
+      </div>
+      <div class="shot"><img src="keyboard.jpg"></div>
+    </div>
+    <div class="strip">
+      <div class="feat"><b>16.8M</b><small>colours per key</small></div>
+      <div class="feat"><b>1 ms</b><small>response time</small></div>
+      <div class="feat"><b>40 h</b><small>wireless battery</small></div>
+      <div class="feat media"><img src="mouse.jpg"><span>+ Prism Mouse</span></div>
+    </div>
+  </div>
+</div>
+<div class="phone"><div class="screen"><div class="notch"></div>
+  <div class="m">
+    <div class="top"><span>PRISM</span><span style="color:#22e4ff">☰</span></div>
+    <div class="eyebrow">New · Keyboard</div>
+    <h2>Every key,<br><span>alive.</span></h2>
+    <p>Per-key light that ripples as you type.</p>
+    <div class="pimg"><img src="keyboard.jpg"></div>
+    <span class="btn primary">Pre-order · $149</span>
+    <span class="btn ghost">Watch the film</span>
+  </div>
+</div></div>
+</body></html>
