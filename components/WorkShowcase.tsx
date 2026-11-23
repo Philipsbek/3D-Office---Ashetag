@@ -1,6 +1,6 @@
 'use client'
 
-// "What I Build" rows. Clicking a row's image lifts it off the page like picking up a letter
+// "Inventory" rows (homepage, formerly "What I Build"). Clicking a row's image lifts it off the page like picking up a letter
 // in a game: it glides to the centre of the screen while growing, tips up a little, then
 // flips over to show the back, which lists my past projects for that row.
 // Esc, the close button or a click outside puts it back (the same motion in reverse).

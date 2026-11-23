@@ -25,7 +25,7 @@ export const site = {
     { name: 'CapCut', logo: '/logos/capcut.svg' },
   ],
 
-  // What I Build on the homepage: two rows. "Websites" covers landing pages, business
+  // Inventory on the homepage (formerly "What I Build"): two rows. "Websites" covers landing pages, business
   // websites and online stores in one row; web apps get their own. Images live in public/work/
   // (sources in blender/mockups/).
   work: [

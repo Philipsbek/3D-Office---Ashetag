@@ -35,7 +35,7 @@ export default function HomeContent() {
       {/* ---------- what I build ---------- */}
       <section id="work" className="block" aria-labelledby="work-title">
         <h2 id="work-title" className="display-section rule-under">
-          What I Build<sup className="counter">({site.work.length})</sup>
+          Inventory<sup className="counter">({site.work.length})</sup>
         </h2>
         <WorkShowcase />
       </section>
