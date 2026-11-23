@@ -49,7 +49,10 @@ export default function Scene() {
       <Canvas
         shadows={!LOW_POWER}
         dpr={LOW_POWER ? [1, 1.25] : [1, 2]} // phones draw at about their real resolution, not 2x
-        camera={{ fov: 50, position: [1, 3.2, 10], near: 0.05, far: 1200 }}
+        // logarithmic depth: city signs, screens and neon strips sit a centimetre or two off their
+        // walls; with plain depth they z-fight (flicker) far away whenever the camera moves
+        gl={{ logarithmicDepthBuffer: true }}
+        camera={{ fov: 50, position: [1, 3.2, 10], near: 0.15, far: 1200 }}
       >
         <color attach="background" args={[SHOW_CITY ? haze : '#000000']} />
         {/* city haze in the time-of-day colour; it only starts past the office so the room stays crisp */}
@@ -441,6 +444,8 @@ function PersonNote({ person, head, onClose }: { person: PersonId | null; head?:
  * own objects (e.g. the arcade screen) get the clicks there.
  */
 const glassVert = /* glsl */ `
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
   uniform float uInflate;
   varying vec3 vNormal;
   varying vec3 vView;
@@ -451,9 +456,11 @@ const glassVert = /* glsl */ `
     vNormal = normalize(mat3(modelMatrix) * normal);
     vView = normalize(cameraPosition - world.xyz);
     gl_Position = projectionMatrix * viewMatrix * world;
+    #include <logdepthbuf_vertex>
   }
 `
 const glassFrag = /* glsl */ `
+  #include <logdepthbuf_pars_fragment>
   uniform float uGlow;
   uniform float uTime;
   uniform float uSweepStart;
@@ -461,6 +468,7 @@ const glassFrag = /* glsl */ `
   varying vec3 vView;
   varying vec3 vWorld;
   void main() {
+    #include <logdepthbuf_fragment>
     float fres = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.0);
     // one diagonal band of light that sweeps across each time the hover starts
     float d = (vWorld.x + vWorld.y * 0.8) * 0.45 - (uTime - uSweepStart) * 2.2 + 2.0;

@@ -783,11 +783,18 @@ function Sky({ day }: { day: Palette }) {
         fog: false,
         // THREE.Color keeps linear values, the same space the fog is applied in
         uniforms: { horizon: { value: new THREE.Color(CITY_HAZE) }, top: { value: new THREE.Color('#020208') } },
-        vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-        fragmentShader: `uniform vec3 horizon;
+        vertexShader: `#include <common>
+          #include <logdepthbuf_pars_vertex>
+          varying vec3 vDir;
+          void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+          #include <logdepthbuf_vertex>
+          }`,
+        fragmentShader: `#include <logdepthbuf_pars_fragment>
+          uniform vec3 horizon;
           uniform vec3 top;
           varying vec3 vDir;
           void main(){
+            #include <logdepthbuf_fragment>
             float y = vDir.y;
             vec3 mid = mix(horizon * 0.22, top, 0.55);
             vec3 c = mix(horizon, mid, smoothstep(0.0, 0.22, y));
@@ -910,7 +917,9 @@ function Rain() {
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       uniforms: { t: { value: 0 } },
-      vertexShader: `attribute vec4 seed; uniform float t; varying float vEnd;
+      vertexShader: `#include <common>
+        #include <logdepthbuf_pars_vertex>
+        attribute vec4 seed; uniform float t; varying float vEnd;
         void main(){
           vec3 p = position;
           float y = mod(p.y - t * 26.0 * seed.y - seed.z, seed.w) + seed.z;
@@ -918,9 +927,13 @@ function Rain() {
           p.x += seed.x * 0.08;     // a slight slant (wind)
           vEnd = seed.x;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          #include <logdepthbuf_vertex>
         }`,
-      fragmentShader: `varying float vEnd;
-        void main(){ gl_FragColor = vec4(0.62, 0.86, 1.0, 0.12 + 0.38 * vEnd); }`,
+      fragmentShader: `#include <logdepthbuf_pars_fragment>
+        varying float vEnd;
+        void main(){
+          #include <logdepthbuf_fragment>
+          gl_FragColor = vec4(0.62, 0.86, 1.0, 0.12 + 0.38 * vEnd); }`,
     })
     return { geom: g, mat: m }
   }, [])
