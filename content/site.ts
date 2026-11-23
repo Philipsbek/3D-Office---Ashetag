@@ -55,7 +55,7 @@ export const site = {
     },
     {
       title: 'Web Apps',
-      image: '/work/build-app.jpg',
+      image: '/work/build-webapps.jpg',
       description: 'I can build dashboards, booking systems and portals with accounts, live data and real-time views.',
       services: ['Accounts', 'Databases', 'APIs'],
       projects: [

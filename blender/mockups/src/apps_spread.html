@@ -1,0 +1,242 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- "Web Apps" spread for the homepage Inventory row: same layout as websites_spread.html, but every
+     screen is drawn here in HTML/SVG (original, fictional apps; no 3D office renders). -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 900px; overflow: hidden; }
+  body {
+    font-family: 'Geist', Arial, sans-serif; color: #e6e6e6;
+    background:
+      radial-gradient(900px 600px at 30% 40%, rgba(122,140,255,.10), transparent 70%),
+      radial-gradient(800px 600px at 80% 70%, rgba(255,176,32,.08), transparent 70%),
+      #101015;
+  }
+  .desk { position: absolute; left: 50%; top: 52%; width: 0; height: 0; transform: rotate(-22deg) scale(.66); }
+  .page {
+    position: absolute; width: 760px; height: 500px; background: #16151d; color: #e6e6e6;
+    box-shadow: 0 40px 80px rgba(0,0,0,.65), 0 12px 24px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04);
+    padding: 34px 36px; overflow: hidden;
+  }
+  .foot { position: absolute; left: 36px; right: 36px; bottom: 18px; display: flex; justify-content: space-between; font: 600 11px 'Geist Mono', monospace; color: #6d6a7a; letter-spacing: .08em; text-transform: uppercase; }
+  .eyebrow { font: 600 12px 'Geist Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+  .meta { font-size: 12px; line-height: 1.7; color: #a8a4b6; } .meta b { color: #fff; font-weight: 600; margin-right: 6px; }
+  .copy { font-size: 12.5px; line-height: 1.55; color: #9d99ab; }
+  h2 { font-size: 30px; letter-spacing: -.035em; font-weight: 700; color: #fff; line-height: 1; }
+  .sub { font-size: 13px; color: #8c8898; margin: 6px 0 16px; }
+
+  .cover { background: #0b0b10; }
+  .cover .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+  .cover .brand img { width: 22px; height: 22px; }
+  .cover .cols { position: absolute; top: 40px; left: 300px; display: flex; gap: 48px; }
+  .cover .cols div { font-size: 11px; line-height: 1.6; color: #9d99ab; }
+  .cover .cols b { display: block; font: 600 10px 'Geist Mono', monospace; letter-spacing: .1em; color: #6d6a7a; margin-bottom: 4px; }
+  .cover h1 { position: absolute; left: 34px; bottom: 96px; font-size: 150px; line-height: .86; letter-spacing: -.055em; font-weight: 700; color: #e6e6e6; white-space: nowrap; }
+  .cover h1 i { font-style: normal; background: linear-gradient(90deg, #7a8cff, #ffb020); -webkit-background-clip: text; color: transparent; }
+  .cover .types { position: absolute; left: 38px; bottom: 34px; display: flex; gap: 8px; }
+  .cover .types span { font: 600 12px 'Geist Mono', monospace; letter-spacing: .06em; text-transform: uppercase; padding: 7px 11px; border: 1px solid; }
+  .cover .glow { position: absolute; right: -120px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,176,32,.28), transparent 65%); }
+
+  /* ---------- app UI kit (screens drawn in HTML) */
+  .app { position: absolute; background: #0c0b11; border: 1px solid rgba(255,255,255,.07); border-radius: 8px; overflow: hidden; font-size: 10px; color: #b9b5c8; }
+  .bar { height: 22px; display: flex; align-items: center; gap: 5px; padding: 0 9px; background: #121119; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .bar i { width: 6px; height: 6px; border-radius: 50%; background: #2d2b38; }
+  .bar span { margin-left: 8px; font: 500 8.5px 'Geist Mono', monospace; color: #5f5b6e; background: #0c0b11; padding: 2px 10px; border-radius: 4px; }
+  .side { position: absolute; left: 0; top: 22px; bottom: 0; width: 92px; background: #0f0e15; border-right: 1px solid rgba(255,255,255,.05); padding: 10px 8px; }
+  .side .logo { font-weight: 700; font-size: 11px; color: #fff; margin-bottom: 12px; display: flex; gap: 6px; align-items: center; }
+  .side .logo em { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .side p { padding: 5px 6px; border-radius: 4px; margin-bottom: 2px; font-size: 9.5px; color: #77738a; }
+  .side p.on { background: rgba(122,140,255,.14); color: #c9cfff; }
+  .main { position: absolute; left: 92px; top: 22px; right: 0; bottom: 0; padding: 12px 14px; }
+  .h { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: -.01em; }
+  .muted { color: #6c687d; font-size: 9px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 10px; }
+  .kpi { background: #131219; border: 1px solid rgba(255,255,255,.05); border-radius: 6px; padding: 8px 9px; }
+  .kpi b { display: block; font-size: 15px; color: #fff; margin-top: 3px; letter-spacing: -.02em; }
+  .kpi s { text-decoration: none; font-size: 8.5px; margin-left: 4px; }
+  .panel { background: #131219; border: 1px solid rgba(255,255,255,.05); border-radius: 6px; padding: 9px 10px; position: absolute; }
+  .pill { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 8.5px; font-weight: 600; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .btn { display: inline-block; padding: 5px 10px; border-radius: 5px; font-size: 9.5px; font-weight: 600; }
+  .phone { position: absolute; background: #0c0b11; border: 3px solid #23212d; border-radius: 22px; overflow: hidden; box-shadow: 0 18px 40px rgba(0,0,0,.6); }
+  .phone .notch { width: 60px; height: 12px; background: #23212d; border-radius: 0 0 8px 8px; margin: 0 auto 8px; }
+</style></head><body>
+<div class="desk">
+
+  <!-- cover: Web Apps, with the three types -->
+  <div class="page cover" style="left:-800px; top:-560px;">
+    <div class="glow"></div>
+    <div class="brand"><img src="spread_logo.svg">Philips Bek ™</div>
+    <div class="cols">
+      <div><b>INFO</b>Volume 02<br>3 app types<br>Plan · Build · Ship</div>
+      <div><b>CONTACT</b>philipsbekwork@gmail.com<br>WhatsApp +60 17-981 2010</div>
+      <div><b>BUILD</b>4 – 12 weeks<br>Accounts · APIs · Data</div>
+    </div>
+    <h1>Web Apps<i>.</i></h1>
+    <div class="types">
+      <span style="color:#7a8cff">01 Dashboards</span>
+      <span style="color:#ffb020">02 Booking systems</span>
+      <span style="color:#22e4ff">03 Client portals</span>
+    </div>
+  </div>
+
+  <!-- 01 dashboard (top-right) -->
+  <div class="page" style="left:20px; top:-640px;">
+    <div class="eyebrow" style="color:#7a8cff">01 · Dashboard</div>
+    <h2 style="margin-top:12px">Ledgerline</h2>
+    <div class="sub">Live revenue · Team reports</div>
+    <div class="meta"><b>Goal</b>One live view of the numbers<br><b>Built</b>4 – 8 weeks<br><b>Stack</b>Next.js · Postgres</div>
+    <p class="copy" style="width:220px;margin-top:16px">Sales, spend and stock pulled from three tools into one screen that updates itself, with reports the team can export.</p>
+    <div class="app" style="left:290px; top:34px; width:436px; height:420px;">
+      <div class="bar"><i></i><i></i><i></i><span>app.ledgerline.io/overview</span></div>
+      <div class="side">
+        <div class="logo"><em style="background:#7a8cff"></em>ledgerline</div>
+        <p class="on">Overview</p><p>Revenue</p><p>Expenses</p><p>Inventory</p><p>Reports</p><p>Team</p><p>Settings</p>
+      </div>
+      <div class="main">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="h">Overview</div><div class="muted">This month · live</div></div><span class="btn" style="background:#7a8cff;color:#0b0b10">Export</span></div>
+        <div class="kpis">
+          <div class="kpi"><span class="muted">Revenue</span><b>$84.2k<s style="color:#3ddc97">+12%</s></b></div>
+          <div class="kpi"><span class="muted">Orders</span><b>1,284<s style="color:#3ddc97">+8%</s></b></div>
+          <div class="kpi"><span class="muted">Avg. order</span><b>$65.6</b></div>
+          <div class="kpi"><span class="muted">Refunds</span><b>0.9%<s style="color:#ff5c7a">+0.1</s></b></div>
+        </div>
+        <div class="panel" style="left:14px; right:14px; top:104px; height:150px;">
+          <div style="display:flex;justify-content:space-between"><span class="h" style="font-size:11px">Revenue</span><span class="muted">Jan – Dec</span></div>
+          <svg viewBox="0 0 300 100" style="width:100%;height:112px;margin-top:4px" preserveAspectRatio="none">
+            <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a8cff" stop-opacity=".45"/><stop offset="1" stop-color="#7a8cff" stop-opacity="0"/></linearGradient></defs>
+            <g stroke="rgba(255,255,255,.05)"><line x1="0" y1="25" x2="300" y2="25"/><line x1="0" y1="50" x2="300" y2="50"/><line x1="0" y1="75" x2="300" y2="75"/></g>
+            <path d="M0,80 C25,74 40,62 60,64 S95,48 120,52 S160,30 185,36 S225,22 250,18 S285,12 300,8 L300,100 L0,100 Z" fill="url(#ga)"/>
+            <path d="M0,80 C25,74 40,62 60,64 S95,48 120,52 S160,30 185,36 S225,22 250,18 S285,12 300,8" fill="none" stroke="#7a8cff" stroke-width="2"/>
+            <path d="M0,88 C30,86 50,80 75,82 S120,72 150,74 S200,64 230,62 S280,54 300,50" fill="none" stroke="#ffb020" stroke-width="1.5" stroke-dasharray="4 3"/>
+          </svg>
+        </div>
+        <div class="panel" style="left:14px; width:150px; top:264px; height:118px;">
+          <span class="h" style="font-size:11px">By channel</span>
+          <svg viewBox="0 0 120 70" style="width:100%;height:80px;margin-top:6px">
+            <g fill="#7a8cff"><rect x="4" y="30" width="14" height="40" rx="2"/><rect x="28" y="12" width="14" height="58" rx="2"/><rect x="52" y="22" width="14" height="48" rx="2"/></g>
+            <g fill="#ffb020"><rect x="76" y="40" width="14" height="30" rx="2"/><rect x="100" y="26" width="14" height="44" rx="2"/></g>
+          </svg>
+        </div>
+        <div class="panel" style="left:174px; right:14px; top:264px; height:118px;">
+          <span class="h" style="font-size:11px">Latest orders</span>
+          <div class="row" style="margin-top:4px"><span>#4821 · Aiko T.</span><span class="pill" style="background:rgba(61,220,151,.15);color:#3ddc97">Paid</span></div>
+          <div class="row"><span>#4820 · Ravi M.</span><span class="pill" style="background:rgba(255,176,32,.15);color:#ffb020">Pending</span></div>
+          <div class="row"><span>#4819 · Lena K.</span><span class="pill" style="background:rgba(61,220,151,.15);color:#3ddc97">Paid</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Philips Bek</span><span>Web Apps · 01</span></div>
+  </div>
+
+  <!-- 02 booking system (bottom-left) -->
+  <div class="page" style="left:-760px; top:-20px;">
+    <div class="app" style="left:0; top:0; width:420px; height:500px; border-radius:0; border:0; background:linear-gradient(160deg,#1b1408,#0c0b11 60%);">
+      <div class="bar" style="background:transparent"><i></i><i></i><i></i><span>book.slotwise.app/week</span></div>
+      <div style="padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="h">This week</div><div class="muted">Studio A · 6 rooms</div></div><span class="btn" style="background:#ffb020;color:#0b0b10">+ New booking</span></div>
+        <div style="display:grid;grid-template-columns:28px repeat(5,1fr);gap:4px;margin-top:14px;font-size:8.5px;color:#6c687d">
+          <span></span><span>Mon 12</span><span>Tue 13</span><span>Wed 14</span><span>Thu 15</span><span>Fri 16</span>
+        </div>
+        <div style="position:relative;display:grid;grid-template-columns:28px repeat(5,1fr);gap:4px;margin-top:6px;height:380px">
+          <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:8px;color:#55516a"><span>9</span><span>10</span><span>11</span><span>12</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+          <div style="position:relative;background:repeating-linear-gradient(#ffffff08 0 1px,transparent 1px 42px)"><div style="position:absolute;left:2px;right:2px;top:10px;height:70px;background:rgba(255,176,32,.2);border-left:2px solid #ffb020;border-radius:4px;padding:4px;color:#ffd27a">Haircut<br><span style="color:#a88a4a">Mia · 9:15</span></div><div style="position:absolute;left:2px;right:2px;top:200px;height:56px;background:rgba(122,140,255,.2);border-left:2px solid #7a8cff;border-radius:4px;padding:4px;color:#c9cfff">Colour<br><span style="color:#7d86b8">Jo · 1:40</span></div></div>
+          <div style="position:relative;background:repeating-linear-gradient(#ffffff08 0 1px,transparent 1px 42px)"><div style="position:absolute;left:2px;right:2px;top:60px;height:96px;background:rgba(34,228,255,.16);border-left:2px solid #22e4ff;border-radius:4px;padding:4px;color:#9ff0ff">Photo shoot<br><span style="color:#5aa6b5">Studio A</span></div></div>
+          <div style="position:relative;background:repeating-linear-gradient(#ffffff08 0 1px,transparent 1px 42px)"><div style="position:absolute;left:2px;right:2px;top:20px;height:52px;background:rgba(255,176,32,.2);border-left:2px solid #ffb020;border-radius:4px;padding:4px;color:#ffd27a">Trim<br><span style="color:#a88a4a">Sam</span></div><div style="position:absolute;left:2px;right:2px;top:150px;height:120px;background:rgba(255,92,122,.16);border-left:2px solid #ff5c7a;border-radius:4px;padding:4px;color:#ffb3c2">Workshop<br><span style="color:#b0687a">12 seats</span></div></div>
+          <div style="position:relative;background:repeating-linear-gradient(#ffffff08 0 1px,transparent 1px 42px)"><div style="position:absolute;left:2px;right:2px;top:100px;height:60px;background:rgba(122,140,255,.2);border-left:2px solid #7a8cff;border-radius:4px;padding:4px;color:#c9cfff">Consult<br><span style="color:#7d86b8">Online</span></div></div>
+          <div style="position:relative;background:repeating-linear-gradient(#ffffff08 0 1px,transparent 1px 42px)"><div style="position:absolute;left:2px;right:2px;top:40px;height:70px;background:rgba(255,176,32,.2);border-left:2px solid #ffb020;border-radius:4px;padding:4px;color:#ffd27a">Haircut<br><span style="color:#a88a4a">Ana</span></div><div style="position:absolute;left:2px;right:2px;top:230px;height:80px;background:rgba(34,228,255,.16);border-left:2px solid #22e4ff;border-radius:4px;padding:4px;color:#9ff0ff">Studio hire</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute; left:452px; top:34px; right:36px;">
+      <div class="eyebrow" style="color:#ffb020">02 · Booking system</div>
+      <h2 style="margin-top:12px">Slotwise</h2>
+      <div class="sub">Appointments · Payments · Reminders</div>
+      <p class="copy">Customers pick a free slot and pay a deposit; staff see the whole week, and reminders go out on WhatsApp by themselves.</p>
+      <div class="meta" style="margin-top:12px"><b>Built</b>4 – 8 weeks · Payments · WhatsApp</div>
+      <div style="position:relative; margin-top:14px; height:170px;">
+        <div class="phone" style="left:60px; top:0; width:120px; height:220px;">
+          <div class="notch"></div>
+          <div style="padding:0 10px">
+            <div class="h" style="font-size:11px">Pick a time</div>
+            <div class="muted" style="margin:2px 0 8px">Thu 15 · Haircut · 45 min</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:8.5px;text-align:center">
+              <span style="border:1px solid #2d2b38;border-radius:4px;padding:4px 0">9:00</span><span style="border:1px solid #2d2b38;border-radius:4px;padding:4px 0;color:#55516a">9:45</span>
+              <span style="background:#ffb020;color:#0b0b10;border-radius:4px;padding:4px 0;font-weight:700">10:30</span><span style="border:1px solid #2d2b38;border-radius:4px;padding:4px 0">11:15</span>
+              <span style="border:1px solid #2d2b38;border-radius:4px;padding:4px 0">1:00</span><span style="border:1px solid #2d2b38;border-radius:4px;padding:4px 0">1:45</span>
+            </div>
+            <div class="btn" style="display:block;text-align:center;margin-top:10px;background:#ffb020;color:#0b0b10">Pay RM20 deposit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot" style="left:452px"><span>Philips Bek</span><span>Web Apps · 02</span></div>
+  </div>
+
+  <!-- 03 client portal (bottom-right) -->
+  <div class="page" style="left:60px; top:-100px;">
+    <div class="eyebrow" style="color:#22e4ff">03 · Client portal</div>
+    <h2 style="margin-top:12px">Clientdeck</h2>
+    <div class="sub">Accounts · Files · Invoices</div>
+    <div class="app" style="left:36px; top:150px; width:330px; height:304px;">
+      <div class="bar"><i></i><i></i><i></i><span>clientdeck.co/login</span></div>
+      <div style="position:absolute;inset:22px 0 0 0;display:grid;place-items:center;background:radial-gradient(240px 160px at 50% 30%,rgba(34,228,255,.12),transparent 70%)">
+        <div style="width:200px">
+          <div style="display:flex;gap:6px;align-items:center;font-weight:700;color:#fff;font-size:12px"><em style="width:12px;height:12px;border-radius:3px;background:#22e4ff;display:inline-block"></em>clientdeck</div>
+          <div class="h" style="margin-top:14px">Welcome back</div>
+          <div class="muted" style="margin-bottom:10px">Sign in to see your projects</div>
+          <div style="border:1px solid #2d2b38;border-radius:5px;padding:7px 8px;margin-bottom:6px;color:#77738a">you@company.com</div>
+          <div style="border:1px solid #2d2b38;border-radius:5px;padding:7px 8px;margin-bottom:10px;color:#77738a">••••••••••</div>
+          <div class="btn" style="display:block;text-align:center;background:#22e4ff;color:#0b0b10">Sign in</div>
+        </div>
+      </div>
+    </div>
+    <div class="app" style="left:380px; top:34px; width:344px; height:200px;">
+      <div class="bar"><i></i><i></i><i></i><span>clientdeck.co/projects</span></div>
+      <div style="padding:10px 12px">
+        <div style="display:flex;justify-content:space-between"><span class="h" style="font-size:11px">Your projects</span><span class="muted">3 active</span></div>
+        <div class="row" style="margin-top:6px"><span>Brand refresh</span><span style="width:90px;height:5px;background:#23212d;border-radius:3px;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:78%;background:#22e4ff;border-radius:3px"></i></span></div>
+        <div class="row"><span>Mobile app</span><span style="width:90px;height:5px;background:#23212d;border-radius:3px;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:42%;background:#7a8cff;border-radius:3px"></i></span></div>
+        <div class="row"><span>SEO audit</span><span style="width:90px;height:5px;background:#23212d;border-radius:3px;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:100%;background:#3ddc97;border-radius:3px"></i></span></div>
+        <div class="row"><span>Invoice #0142</span><span class="pill" style="background:rgba(255,176,32,.15);color:#ffb020">Due in 5 days</span></div>
+      </div>
+    </div>
+    <div class="app" style="left:380px; top:248px; width:166px; height:206px;">
+      <div style="padding:10px">
+        <span class="h" style="font-size:11px">Files</span>
+        <div class="row" style="margin-top:4px"><span>📄 Brief.pdf</span><span class="muted">2 MB</span></div>
+        <div class="row"><span>🖼 Logo-v3.png</span><span class="muted">640 KB</span></div>
+        <div class="row"><span>📊 Report.xlsx</span><span class="muted">1 MB</span></div>
+        <div class="row"><span>🎬 Promo.mp4</span><span class="muted">48 MB</span></div>
+        <div class="btn" style="display:block;text-align:center;margin-top:10px;border:1px dashed #2d2b38;color:#77738a">Drop files to upload</div>
+      </div>
+    </div>
+    <div class="app" style="left:558px; top:248px; width:166px; height:206px; background:#0f1d22;">
+      <div style="padding:10px">
+        <span class="h" style="font-size:11px">Messages</span>
+        <div style="margin-top:8px;background:#16262c;border-radius:8px 8px 8px 2px;padding:6px 8px;color:#bfe9f2;width:86%">Draft 2 is ready for review 👀</div>
+        <div style="margin:6px 0 0 auto;background:#22e4ff;color:#0b0b10;border-radius:8px 8px 2px 8px;padding:6px 8px;width:70%;font-weight:600">Looks great, approved!</div>
+        <div style="margin-top:6px;background:#16262c;border-radius:8px 8px 8px 2px;padding:6px 8px;color:#bfe9f2;width:60%">Invoice sent ✓</div>
+      </div>
+    </div>
+    <div class="foot"><span>Philips Bek</span><span>Web Apps · 03</span></div>
+  </div>
+
+  <!-- pages peeking in at the edges -->
+  <div class="page" style="left:880px; top:-300px; width:520px; background:#1c1a24;">
+    <div class="app" style="left:36px; top:34px; width:448px; height:280px;">
+      <div class="bar"><i></i><i></i><i></i><span>board · Sprint 14</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px">
+        <div><div class="muted" style="margin-bottom:6px">TO DO · 4</div><div class="kpi" style="margin-bottom:6px">Stripe webhooks<br><span class="pill" style="background:rgba(122,140,255,.15);color:#c9cfff;margin-top:4px">API</span></div><div class="kpi">Invite flow</div></div>
+        <div><div class="muted" style="margin-bottom:6px">DOING · 2</div><div class="kpi" style="margin-bottom:6px;border-color:#ffb02055">Booking reminders<br><span class="pill" style="background:rgba(255,176,32,.15);color:#ffb020;margin-top:4px">WhatsApp</span></div><div class="kpi">CSV import</div></div>
+        <div><div class="muted" style="margin-bottom:6px">DONE · 9</div><div class="kpi" style="margin-bottom:6px;color:#6c687d">Login + 2FA</div><div class="kpi" style="color:#6c687d">Roles</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="page" style="left:-1100px; top:-1180px; background:#1c1a24;">
+    <div style="position:absolute; left:36px; bottom:34px; width:688px; height:300px; background:linear-gradient(120deg,#7a8cff,#ffb020); display:grid; place-items:center;">
+      <svg viewBox="0 0 300 120" style="width:80%;height:70%"><path d="M0,100 C40,90 60,60 100,70 S160,30 200,40 S260,10 300,6" fill="none" stroke="#0b0b10" stroke-width="5"/></svg>
+    </div>
+  </div>
+</div>
+</body></html>
