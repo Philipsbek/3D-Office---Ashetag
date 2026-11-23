@@ -892,7 +892,9 @@ function CameraRig() {
   const size = useThree((st) => st.size)
   // A memo open? Fly in on its spot, framed on the left (the memo card sits on the right);
   // in portrait the spot sits in the top half and the card slides up from the bottom.
-  const memoShot = useMemo((): Shot | null => {
+  // computed lazily: a memo opened from a link can arrive before the office has loaded,
+  // so keep trying each frame until its spot exists
+  const computeMemoShot = (): Shot | null => {
     const cfg = memo ? MEMO_SPOTS[memo] : undefined
     const spot = cfg ? scene.getObjectByName(cfg.object) : null
     if (!spot || !cfg) return null
@@ -908,11 +910,14 @@ function CameraRig() {
     const forward = back.clone().negate()
     const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize()
     const portrait = size.width < size.height
-    const target = portrait ? c.clone().add(new THREE.Vector3(0, -1.9, 0)) : c.clone().addScaledVector(right, 0.95)
+    const target = portrait ? c.clone().add(new THREE.Vector3(0, -1.2, 0)) : c.clone().addScaledVector(right, 0.95)
     const pos = target.clone().addScaledVector(back, portrait ? 4.6 : 3.4)
     return { pos: pos.toArray() as Vec3, target: target.toArray() as Vec3, parallax: 0.12 }
-  }, [memo, scene, size.width, size.height])
-  const shot = memoShot ?? shotFor(pathname)
+  }
+  const memoShotRef = useRef<Shot | null>(null)
+  useEffect(() => {
+    memoShotRef.current = null
+  }, [memo, size.width, size.height])
   const lookAt = useRef(new THREE.Vector3(0, 1.4, -2))
   const shift = useRef(0) // horizontal view offset in px (see the end of useFrame)
   const goalPos = useMemo(() => new THREE.Vector3(), [])
@@ -931,6 +936,8 @@ function CameraRig() {
   }, [camera, size])
 
   useFrame((state, dt) => {
+    if (memo && !memoShotRef.current) memoShotRef.current = computeMemoShot()
+    const shot = (memo && memoShotRef.current) || shotFor(pathname)
     // smooth, frame-rate independent easing toward the current page's shot
     const k = 1 - Math.exp(-dt * 3)
     const p = shot.parallax

@@ -473,7 +473,7 @@ sup.counter {
     align-items: flex-end; justify-content: center; padding: 16px 16px 72px;
     background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.35));
   }
-  .memo { max-height: 55vh; animation-name: memo-up; }
+  .memo { animation-name: memo-up; }
 }
 .memo-tape {
   position: absolute; top: -12px; left: 50%; width: 110px; height: 26px; margin-left: -55px;
@@ -535,3 +535,30 @@ sup.counter {
 .person-note-status em { font-style: normal; }
 .person-note-text { font-size: 13px; line-height: 1.4; margin-top: 10px; }
 @media (prefers-reduced-motion: reduce) { .person-note.is-open { animation: none; } }
+
+/* ---------- phones: compact memo + person note so the zoomed-in view stays visible ---------- */
+@media (max-aspect-ratio: 1/1) {
+  .memo-backdrop { padding: 12px 12px 70px; background: none; }
+  .memo {
+    width: min(320px, 100%); max-height: 26vh; overflow-y: auto;
+    padding: 12px 14px 10px; transform: rotate(-1deg);
+    background-image: repeating-linear-gradient(180deg, transparent 0 19px, rgba(80, 110, 160, .12) 19px 20px);
+    background-position: 0 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  }
+  .memo-tape { top: -8px; width: 64px; height: 16px; margin-left: -32px; }
+  .memo-head { margin-bottom: 2px; }
+  .memo-eyebrow { font-size: 9px; }
+  .memo-close { font-size: 22px; }
+  .memo-name { font-size: 22px; gap: 6px; }
+  .memo-zzz { font-size: 11px; }
+  .memo-role { font-size: 11px; margin-top: 3px; }
+  .memo-status { font-size: 10px; margin-top: 6px; padding: 3px 6px; }
+  .memo-note { font-size: 12.5px; line-height: 1.35; margin: 8px 0 2px; }
+  .memo-facts, .memo-signoff { display: none; } /* the extras stay on desktop */
+
+  .person-note { width: 190px; padding: 12px 11px 10px; }
+  .person-note-name { font-size: 18px; }
+  .person-note-role { font-size: 10.5px; }
+  .person-note-status { font-size: 9.5px; margin-top: 6px; }
+  .person-note-text { font-size: 11.5px; line-height: 1.35; margin-top: 7px; }
+}
