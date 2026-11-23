@@ -1,37 +1,32 @@
 'use client'
 
-// An ORIGINAL lo-fi synthwave loop played live with the Web Audio API (nothing to download):
-// warm detuned pads over Am – F – C – G, a soft sub bass, a gentle four-on-the-floor kick,
-// off-beat hats and a delayed arpeggio. ~92 BPM, 8-bar loop.
+// The office music: an audio track (public/audio/office-music.m4a) on loop, routed through the
+// Web Audio API so it can fade in / out smoothly. A small analyser listens to the low end and
+// reports kicks as "beats" (the boombox pulses on them).
 //
 // Browsers only allow sound after the visitor interacts with the page, so music starts on
-// the first click/tap/key (unless they muted it before). `music.on(...)` reports state and
-// beats (the boombox pulses on them).
+// the first click/tap/key (unless they muted it before). `music.on(...)` reports state and beats.
 
 type Listener = (e: { playing: boolean; beat?: number }) => void
 
-const BPM = 92
-const BEAT = 60 / BPM
-const CHORDS = [
-  [57, 60, 64], // A minor
-  [53, 57, 60], // F
-  [48, 52, 55], // C
-  [55, 59, 62], // G
-]
-const ARP = [0, 1, 2, 1, 2, 0, 1, 2]
-const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12)
+const SRC = '/audio/office-music.m4a'
 const STORE = 'pb-music-muted'
 
 class Music {
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
-  private delay: DelayNode | null = null
-  private timer: number | null = null
-  private nextTime = 0
-  private step = 0 // 8th-note steps
+  private audio: HTMLAudioElement | null = null
+  private analyser: AnalyserNode | null = null
+  private bins: Uint8Array<ArrayBuffer> | null = null
+  private raf: number | null = null
+  private stopTimer: number | null = null
   private listeners = new Set<Listener>()
   playing = false
   private startedAt = 0
+  // beat detection
+  private avg = 0
+  private lastBeat = 0
+  private beats = 0
   /** the visitor chose to mute (remembered between visits) */
   muted = (() => {
     try {
@@ -54,27 +49,29 @@ class Music {
     if (this.ctx) return
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     const ctx = new Ctx()
+    const audio = new Audio(SRC)
+    audio.loop = true
+    audio.preload = 'auto'
+    audio.crossOrigin = 'anonymous'
+    const src = ctx.createMediaElementSource(audio)
     const master = ctx.createGain()
     master.gain.value = 0
-    const comp = ctx.createDynamicsCompressor()
-    master.connect(comp).connect(ctx.destination)
-    // shared echo for the arpeggio
-    const delay = ctx.createDelay(1)
-    delay.delayTime.value = BEAT * 0.75
-    const fb = ctx.createGain()
-    fb.gain.value = 0.32
-    const wet = ctx.createGain()
-    wet.gain.value = 0.35
-    delay.connect(fb).connect(delay)
-    delay.connect(wet).connect(master)
+    src.connect(master).connect(ctx.destination)
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 1024
+    analyser.smoothingTimeConstant = 0.6
+    src.connect(analyser)
     this.ctx = ctx
+    this.audio = audio
     this.master = master
-    this.delay = delay
+    this.analyser = analyser
+    this.bins = new Uint8Array(analyser.frequencyBinCount)
   }
 
   private volume() {
     const phone = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
-    return phone ? 0.16 : 0.22
+    // soft background level: a mastered song is loud, so keep it well under full volume
+    return phone ? 0.14 : 0.18
   }
 
   private fade(to: number, secs: number) {
@@ -94,9 +91,17 @@ class Music {
     if (this.playing) return
     this.playing = true
     this.startedAt = performance.now()
-    this.nextTime = ctx.currentTime + 0.1
+    if (this.stopTimer !== null) {
+      clearTimeout(this.stopTimer)
+      this.stopTimer = null
+    }
+    void this.audio!.play().catch(() => {
+      // blocked (no user gesture yet): stay off until the next interaction
+      this.playing = false
+      this.emit()
+    })
     this.fade(this.paused ? 0 : this.volume(), 2.5)
-    if (this.timer === null) this.timer = window.setInterval(() => this.schedule(), 25)
+    if (this.raf === null) this.listen()
     this.emit()
   }
 
@@ -104,11 +109,9 @@ class Music {
     if (!this.playing) return
     this.playing = false
     this.fade(0, 0.8)
-    window.setTimeout(() => {
-      if (!this.playing && this.timer !== null) {
-        clearInterval(this.timer)
-        this.timer = null
-      }
+    this.stopTimer = window.setTimeout(() => {
+      this.stopTimer = null
+      if (!this.playing) this.audio?.pause()
     }, 900)
     this.emit()
   }
@@ -137,121 +140,32 @@ class Music {
     if (this.playing) this.fade(p ? 0 : this.volume(), p ? 0.6 : 1.5)
   }
 
-  // ---------------------------------------------------------------- the song
-  private schedule() {
-    const ctx = this.ctx!
-    while (this.nextTime < ctx.currentTime + 0.12) {
-      this.playStep(this.step, this.nextTime)
-      this.nextTime += BEAT / 2
-      this.step = (this.step + 1) % 64 // 8 bars of 8 eighths
-    }
-  }
-
-  private playStep(s: number, t: number) {
-    const bar = Math.floor(s / 8)
-    const chord = CHORDS[bar % 4]
-    const e = s % 8 // eighth inside the bar
-    if (e === 0) this.pad(chord, t, BEAT * 4)
-    if (e % 2 === 0) {
-      this.kick(t)
-      this.bass(chord[0] - 24, t, BEAT * 0.9)
-      const beat = s / 2
-      const delayMs = Math.max(0, (t - this.ctx!.currentTime) * 1000)
-      window.setTimeout(() => this.emit(beat), delayMs)
-    } else this.hat(t)
-    if (bar >= 2) this.arp(chord[ARP[e]] + 12, t, BEAT * 0.45)
-  }
-
-  private env(g: GainNode, t: number, a: number, peak: number, d: number) {
-    g.gain.setValueAtTime(0.0001, t)
-    g.gain.exponentialRampToValueAtTime(peak, t + a)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d)
-  }
-
-  private pad(notes: number[], t: number, len: number) {
-    const ctx = this.ctx!
-    const lp = ctx.createBiquadFilter()
-    lp.type = 'lowpass'
-    lp.frequency.setValueAtTime(700, t)
-    lp.frequency.linearRampToValueAtTime(1600, t + len * 0.5)
-    lp.frequency.linearRampToValueAtTime(800, t + len)
-    const g = ctx.createGain()
-    g.gain.setValueAtTime(0.0001, t)
-    g.gain.exponentialRampToValueAtTime(0.11, t + 0.6)
-    g.gain.setValueAtTime(0.11, t + len - 0.4)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + len + 0.3)
-    lp.connect(g).connect(this.master!)
-    for (const n of notes)
-      for (const det of [-8, 8]) {
-        const o = ctx.createOscillator()
-        o.type = 'sawtooth'
-        o.frequency.value = hz(n)
-        o.detune.value = det
-        o.connect(lp)
-        o.start(t)
-        o.stop(t + len + 0.4)
+  // ------------------------------------------------- kick detection for the boombox pulse
+  private listen() {
+    const tick = () => {
+      if (!this.playing) {
+        this.raf = null
+        return
       }
-  }
-
-  private bass(n: number, t: number, len: number) {
-    const ctx = this.ctx!
-    const o = ctx.createOscillator()
-    o.type = 'triangle'
-    o.frequency.value = hz(n)
-    const g = ctx.createGain()
-    this.env(g, t, 0.02, 0.22, len)
-    o.connect(g).connect(this.master!)
-    o.start(t)
-    o.stop(t + len + 0.1)
-  }
-
-  private kick(t: number) {
-    const ctx = this.ctx!
-    const o = ctx.createOscillator()
-    o.frequency.setValueAtTime(120, t)
-    o.frequency.exponentialRampToValueAtTime(42, t + 0.18)
-    const g = ctx.createGain()
-    this.env(g, t, 0.005, 0.5, 0.28)
-    o.connect(g).connect(this.master!)
-    o.start(t)
-    o.stop(t + 0.35)
-  }
-
-  private noise: AudioBuffer | null = null
-  private hat(t: number) {
-    const ctx = this.ctx!
-    if (!this.noise) {
-      this.noise = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate)
-      const d = this.noise.getChannelData(0)
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
+      this.raf = requestAnimationFrame(tick)
+      if (this.paused) return
+      const a = this.analyser!
+      const b = this.bins!
+      a.getByteFrequencyData(b)
+      // ~0–150 Hz: the kick / bass
+      const hzPerBin = this.ctx!.sampleRate / a.fftSize
+      const n = Math.max(2, Math.round(150 / hzPerBin))
+      let e = 0
+      for (let i = 1; i <= n; i++) e += b[i]
+      e /= n
+      const now = performance.now()
+      if (e > 120 && e > this.avg * 1.18 && now - this.lastBeat > 280) {
+        this.lastBeat = now
+        this.emit(this.beats++)
+      }
+      this.avg = this.avg * 0.92 + e * 0.08
     }
-    const src = ctx.createBufferSource()
-    src.buffer = this.noise
-    const hp = ctx.createBiquadFilter()
-    hp.type = 'highpass'
-    hp.frequency.value = 7000
-    const g = ctx.createGain()
-    this.env(g, t, 0.003, 0.06, 0.05)
-    src.connect(hp).connect(g).connect(this.master!)
-    src.start(t)
-    src.stop(t + 0.1)
-  }
-
-  private arp(n: number, t: number, len: number) {
-    const ctx = this.ctx!
-    const o = ctx.createOscillator()
-    o.type = 'square'
-    o.frequency.value = hz(n)
-    const lp = ctx.createBiquadFilter()
-    lp.type = 'lowpass'
-    lp.frequency.value = 2200
-    const g = ctx.createGain()
-    this.env(g, t, 0.01, 0.045, len)
-    o.connect(lp).connect(g)
-    g.connect(this.master!)
-    g.connect(this.delay!)
-    o.start(t)
-    o.stop(t + len + 0.05)
+    this.raf = requestAnimationFrame(tick)
   }
 }
 
