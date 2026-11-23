@@ -1,0 +1,111 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 900px; overflow: hidden; }
+  body {
+    font-family: 'Geist', Arial, sans-serif; color: #e6e6e6;
+    background:
+      radial-gradient(900px 600px at 30% 40%, rgba(34,228,255,.09), transparent 70%),
+      radial-gradient(800px 600px at 80% 70%, rgba(255,79,216,.10), transparent 70%),
+      #101015;
+  }
+  .desk { position: absolute; left: 50%; top: 52%; width: 0; height: 0; transform: rotate(-22deg) scale(.66); }
+  .page {
+    position: absolute; width: 760px; height: 500px; background: #16151d; color: #e6e6e6;
+    box-shadow: 0 40px 80px rgba(0,0,0,.65), 0 12px 24px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.04);
+    padding: 34px 36px; overflow: hidden;
+  }
+  .foot { position: absolute; left: 36px; right: 36px; bottom: 18px; display: flex; justify-content: space-between; font: 600 11px 'Geist Mono', monospace; color: #6d6a7a; letter-spacing: .08em; text-transform: uppercase; }
+  .eyebrow { font: 600 12px 'Geist Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+  .meta { font-size: 12px; line-height: 1.7; color: #a8a4b6; } .meta b { color: #fff; font-weight: 600; margin-right: 6px; }
+  .copy { font-size: 12.5px; line-height: 1.55; color: #9d99ab; }
+  .ph { position: absolute; overflow: hidden; }
+  .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  h2 { font-size: 30px; letter-spacing: -.035em; font-weight: 700; color: #fff; line-height: 1; }
+  .sub { font-size: 13px; color: #8c8898; margin: 6px 0 16px; }
+
+  .cover { background: #0b0b10; }
+  .cover .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+  .cover .brand img { width: 22px; height: 22px; }
+  .cover .cols { position: absolute; top: 40px; left: 300px; display: flex; gap: 48px; }
+  .cover .cols div { font-size: 11px; line-height: 1.6; color: #9d99ab; }
+  .cover .cols b { display: block; font: 600 10px 'Geist Mono', monospace; letter-spacing: .1em; color: #6d6a7a; margin-bottom: 4px; }
+  .cover h1 { position: absolute; left: 34px; bottom: 96px; font-size: 150px; line-height: .86; letter-spacing: -.055em; font-weight: 700; color: #e6e6e6; }
+  .cover h1 i { font-style: normal; background: linear-gradient(90deg, #22e4ff, #ff4fd8); -webkit-background-clip: text; color: transparent; }
+  .cover .types { position: absolute; left: 38px; bottom: 34px; display: flex; gap: 8px; }
+  .cover .types span { font: 600 12px 'Geist Mono', monospace; letter-spacing: .06em; text-transform: uppercase; padding: 7px 11px; border: 1px solid; }
+  .cover .glow { position: absolute; right: -120px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(122,140,255,.35), transparent 65%); }
+</style></head><body>
+<div class="desk">
+
+  <!-- cover: Websites, with the three types -->
+  <div class="page cover" style="left:-800px; top:-560px;">
+    <div class="glow"></div>
+    <div class="brand"><img src="spread_logo.svg">Philips Bek ™</div>
+    <div class="cols">
+      <div><b>INFO</b>Volume 01<br>3 website types<br>Design · Build · Launch</div>
+      <div><b>CONTACT</b>philipsbekwork@gmail.com<br>WhatsApp +60 17-981 2010</div>
+      <div><b>BUILD</b>1 – 6 weeks<br>Next.js · CMS · SEO</div>
+    </div>
+    <h1>Websites<i>.</i></h1>
+    <div class="types">
+      <span style="color:#22e4ff">01 Landing pages</span>
+      <span style="color:#ff4fd8">02 Business sites</span>
+      <span style="color:#b6ff3b">03 Online stores</span>
+    </div>
+  </div>
+
+  <!-- 01 landing page (top-right) -->
+  <div class="page" style="left:20px; top:-640px;">
+    <div class="eyebrow" style="color:#22e4ff">01 · Landing page</div>
+    <h2 style="margin-top:12px">Prism K1</h2>
+    <div class="sub">Product launch · Pre-orders</div>
+    <div class="meta"><b>Goal</b>Launch + pre-orders<br><b>Built</b>1 – 2 weeks<br><b>Stack</b>Next.js · 3D</div>
+    <p class="copy" style="width:230px;margin-top:16px">One focused page that sells a keyboard: a bold hero, live lighting, three key numbers and one pre-order button.</p>
+    <div class="ph" style="left:300px; top:34px; width:426px; height:240px; background:#2a1748;"><img src="spread_landing.jpg"></div>
+    <div class="ph" style="left:300px; top:290px; width:206px; height:170px; background:#0e2f3a;"><img src="spread_kb.jpg" style="object-position:50% 45%"></div>
+    <div class="ph" style="left:520px; top:290px; width:206px; height:170px; background:#3a1030;"><img src="spread_mouse.jpg" style="object-position:30% 50%"></div>
+    <div class="foot"><span>Philips Bek</span><span>Websites · 01</span></div>
+  </div>
+
+  <!-- 02 business website (bottom-left) -->
+  <div class="page" style="left:-760px; top:-20px;">
+    <div class="ph" style="left:0; top:0; width:420px; height:500px; background:linear-gradient(160deg,#3a1240,#120a1c);">
+      <img src="neon_alley.jpg" style="object-position:50% 55%; transform:scale(1.9); transform-origin:50% 52%; mix-blend-mode:screen">
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(255,79,216,.35),transparent 50%)"></div>
+    </div>
+    <div style="position:absolute; left:452px; top:34px; right:36px;">
+      <div class="eyebrow" style="color:#ff4fd8">02 · Business website</div>
+      <h2 style="margin-top:12px">Neon Motors</h2>
+      <div class="sub">Garage site · Online booking</div>
+      <p class="copy">A late-night garage needed a real home online: services, prices and a booking flow customers can use at 2 am.</p>
+      <div class="ph" style="position:relative; margin-top:18px; width:100%; height:150px; background:linear-gradient(120deg,#2a0f24,#120a1c); display:flex; gap:12px; justify-content:center; padding:10px 0;"><img src="spread_business_phone.jpg" style="width:auto; height:100%; object-fit:contain"><img src="ramen_corner.jpg" style="width:150px; height:100%; object-fit:cover; object-position:50% 50%; transform:scale(1.6)"></div>
+      <div class="meta" style="margin-top:16px"><b>Built</b>2 – 4 weeks · CMS · SEO</div>
+    </div>
+    <div class="foot" style="left:452px"><span>Philips Bek</span><span>Websites · 02</span></div>
+  </div>
+
+  <!-- 03 online store (bottom-right) -->
+  <div class="page" style="left:60px; top:-100px;">
+    <div class="eyebrow" style="color:#b6ff3b">03 · Online store</div>
+    <h2 style="margin-top:12px">Loftgear</h2>
+    <div class="sub">Gaming setups shop · Checkout</div>
+    <div class="ph" style="left:36px; top:150px; width:330px; height:304px; background:#14241a;"><img src="spread_store.jpg" style="object-position:20% 30%; transform:scale(1.15); transform-origin:15% 25%"></div>
+    <div class="ph" style="left:380px; top:34px; width:344px; height:200px; background:#21123a;"><img src="sim_rig_dark.jpg" style="object-position:28% 55%; transform:scale(1.6); transform-origin:28% 55%"></div>
+    <div class="ph" style="left:380px; top:248px; width:166px; height:206px; background:#b6ff3b;"><img src="arcade_cabinets_dark.jpg" style="object-position:50% 40%; mix-blend-mode:multiply"></div>
+    <div class="ph" style="left:558px; top:248px; width:166px; height:206px; background:#0d0c14; display:grid; place-items:center;">
+      <img src="spread_logo.svg" style="width:96px;height:96px;object-fit:contain">
+    </div>
+    <div class="foot"><span>Philips Bek</span><span>Websites · 03</span></div>
+  </div>
+
+  <!-- pages peeking in at the edges -->
+  <div class="page" style="left:880px; top:-300px; width:520px; background:#1c1a24;">
+    <div class="ph" style="left:36px; top:34px; width:448px; height:280px; background:#120d2c;"><img src="spread_console.png" style="object-position:30% 40%"></div>
+  </div>
+  <div class="page" style="left:-1100px; top:-1180px; background:#1c1a24;">
+    <div class="ph" style="left:36px; bottom:34px; width:688px; height:300px; background:#22e4ff;"><img src="spread_kb.jpg" style="object-position:50% 50%;mix-blend-mode:multiply"></div>
+  </div>
+</div>
+</body></html>

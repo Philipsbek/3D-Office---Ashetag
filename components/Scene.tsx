@@ -804,7 +804,7 @@ function Zzz({ position }: { position: [number, number, number] }) {
 
 const ARCADE_W = 512
 const ARCADE_H = 400
-const ARCADE_TILES: ArcadeTile[] = site.work.map((w) => ({
+const ARCADE_TILES: ArcadeTile[] = site.builds.map((w) => ({
   title: w.title,
   color: w.arcade.color,
   icon: w.arcade.icon as ArcadeTile['icon'],
@@ -1071,7 +1071,7 @@ function servicesTexture() {
   ctx.fillText('What I Build', 64, 140)
   // the same four entries as the homepage's What We Build section (content/site.ts),
   // each in its arcade colour, with its typical timeline on the right
-  site.work.forEach((w, i) => {
+  site.builds.forEach((w, i) => {
     const y = 250 + i * 76
     ctx.font = '40px ui-monospace, Consolas, monospace'
     ctx.fillStyle = w.arcade.color

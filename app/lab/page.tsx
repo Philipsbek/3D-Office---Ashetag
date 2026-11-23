@@ -41,7 +41,7 @@ export default function Lab() {
     onPointerLeave: () => arcadeBus.emit({ type: 'key', code, down: false }),
   })
 
-  const item = open !== null ? site.work[open] : null
+  const item = open !== null ? site.builds[open] : null
   const article = item && /^[AEIOU]/i.test(item.title) ? 'an' : 'a'
   const message = item
     ? `Hi Philips, I'm interested in ${article} ${item.title.replace(/s$/, '')} and would like to know more!`

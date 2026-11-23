@@ -25,9 +25,28 @@ export const site = {
     { name: 'CapCut', logo: '/logos/capcut.svg' },
   ],
 
-  // What I Build: the kinds of websites I offer. Images live in public/work/ (mock-ups
-  // built from my own 3D models; sources in blender/mockups/).
+  // What I Build on the homepage: two rows. "Websites" covers landing pages, business
+  // websites and online stores in one row; web apps get their own. Images live in public/work/
+  // (sources in blender/mockups/).
   work: [
+    {
+      title: 'Websites',
+      image: '/work/build-websites.jpg',
+      description:
+        'I can build the website your business needs: a focused landing page to launch a product, a full business site with booking and pages your team can edit, or an online store that loads fast and checks out smoothly on any device.',
+      services: ['Landing pages', 'Business websites', 'Online stores', 'CMS · SEO', 'E-commerce · Payments'],
+    },
+    {
+      title: 'Web Apps',
+      image: '/work/build-app.jpg',
+      description: 'I can build dashboards, booking systems and portals with accounts, live data and real-time views.',
+      services: ['Accounts', 'Databases', 'APIs'],
+    },
+  ],
+
+  // The four types in detail: used by the Lab arcade (one tile each) and the Services
+  // screen in the office.
+  builds: [
     {
       title: 'Landing Pages',
       image: '/work/build-landing.jpg',
