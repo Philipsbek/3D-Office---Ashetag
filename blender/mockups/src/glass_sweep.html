@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Reference frames of the always-on glass sweep on the What I Build images (same CSS as app/globals.css) -->
+<html><head><meta charset="utf-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Geist+Mono:wght@600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1600px;height:900px;overflow:hidden;background:#000}
+body{font-family:'Geist',Arial,sans-serif;font-weight:600;color:#e6e6e6;padding:40px 48px}
+.tagline{display:flex;align-items:baseline;gap:16px;margin-bottom:30px}
+.tagline b{font-size:15px;color:#000;background:#ff4d00;padding:4px 8px}
+.tagline span{font-size:26px;letter-spacing:-.02em}
+.tagline em{font-style:normal;color:#757575;font-size:18px}
+.frames{display:grid;grid-template-columns:repeat(2,610px);gap:18px 40px;justify-content:center}
+.cap{margin-top:10px;font-size:15px;color:#c4c4c4}.cap b{color:#ff4d00;font-family:'Geist Mono',monospace;font-size:12px;margin-right:8px}
+.m{position:relative;aspect-ratio:16/9;border:1px solid rgba(230,230,230,.2);overflow:hidden;background:#1a1a1a}
+.m img{width:100%;height:100%;object-fit:cover;display:block}
+.m::before,.m::after{content:'';position:absolute;inset:0;pointer-events:none}
+.m::before{box-shadow:inset 0 0 0 1px rgba(209,235,255,.22),inset 0 0 36px rgba(209,235,255,.07)}
+.m::after{background:linear-gradient(115deg,transparent 36%,rgba(209,235,255,.07) 44%,rgba(228,243,255,.26) 50%,rgba(209,235,255,.07) 56%,transparent 64%);background-size:260% 100%;background-repeat:no-repeat;mix-blend-mode:screen}
+.f0::after{background-position:160% 0}.f1::after{background-position:68% 0}.f2::after{background-position:46% 0}.f3::after{background-position:26% 0}
+</style></head><body>
+<div class="tagline"><b>Option 6</b><span>Always-on glass sweep</span><em>faint glass edge + a band of light crossing every ~5.5 s (like the office hover glass)</em></div>
+<div class="frames">
+<div><div class="m f0"><img src="../../../public/work/build-websites.jpg"></div><p class="cap"><b>0.0 s</b>resting: only the faint glass edge</p></div>
+<div><div class="m f1"><img src="../../../public/work/build-websites.jpg"></div><p class="cap"><b>0.6 s</b>the light band enters from the left</p></div>
+<div><div class="m f2"><img src="../../../public/work/build-websites.jpg"></div><p class="cap"><b>1.0 s</b>crossing the middle</p></div>
+<div><div class="m f3"><img src="../../../public/work/build-websites.jpg"></div><p class="cap"><b>1.5 s</b>leaving on the right, then rests ~4 s</p></div>
+</div></body></html>

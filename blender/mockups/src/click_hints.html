@@ -1,0 +1,111 @@
+<!doctype html>
+<!-- Reference renders of five "this image is clickable / has a back side" hints for the
+     What I Build rows. Pick the variant with ?v=1..5  (render: sh render.sh is not used; see
+     blender/mockups/render_hints.sh) -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@500;600&family=Geist+Mono:wght@600&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1600px; height: 900px; overflow: hidden; background: #000; }
+body { font-family: 'Geist', Arial, sans-serif; font-weight: 600; color: #e6e6e6; padding: 40px 48px; }
+.tagline { display: flex; align-items: baseline; gap: 16px; margin-bottom: 26px; }
+.tagline b { font-size: 15px; color: #000; background: #ff4d00; padding: 4px 8px; }
+.tagline span { font-size: 26px; letter-spacing: -0.02em; }
+.tagline em { font-style: normal; color: #757575; font-size: 18px; }
+h2 { font-size: 64px; line-height: .89; letter-spacing: -0.04em; padding-bottom: 14px; border-bottom: 1px solid rgba(230,230,230,.3); }
+h2 sup { font-size: 11px; color: #757575; vertical-align: top; }
+.row { display: grid; grid-template-columns: 860px 1fr 240px; gap: 16px 48px; padding-top: 18px; }
+.desc { font-size: 19px; line-height: 1; letter-spacing: -0.02em; color: #c4c4c4; }
+.title { font-size: 36px; line-height: .89; letter-spacing: -0.04em; text-align: right; }
+.services { margin-top: 230px; font-size: 19px; line-height: 1.25; }
+
+.stage { position: relative; width: 860px; height: 484px; perspective: 1800px; }
+.media { position: absolute; inset: 0; border: 1px solid rgba(230,230,230,.2); overflow: hidden; background: #1a1a1a; }
+.media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.note { position: absolute; font-family: 'Geist Mono', monospace; font-size: 12px; color: #ff4d00; letter-spacing: .02em; text-transform: uppercase; }
+
+/* ---------- 1: peeled corner: the corner is folded over, showing the card's dark back */
+.peel { position: absolute; right: -1px; bottom: -1px; width: 132px; height: 132px; pointer-events: none; }
+.peel .under { position: absolute; inset: 0; background: #000; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.peel .wrap { position: absolute; inset: 0; filter: drop-shadow(-7px -7px 9px rgba(0,0,0,.85)); }
+.peel .flap {
+  position: absolute; inset: 0;
+  /* the back of the card: dark, catching light along the fold, darker toward the tip */
+  background: linear-gradient(135deg, #0c0c0f 0%, #17171c 38%, #2c2c33 47%, #4a4a54 49.6%, transparent 50%);
+  clip-path: polygon(0 100%, 100% 0, 0 0);
+}
+.peel .fold { position: absolute; inset: 0; background: linear-gradient(135deg, transparent 49.3%, rgba(34,228,255,.55) 49.8%, transparent 50.4%); }
+.peel .count { position: absolute; left: 16px; top: 20px; font-size: 16px; color: #e6e6e6; display: flex; gap: 6px; align-items: center; }
+.peel .count i { font-style: normal; color: #ff4d00; }
+.shadowband { position: absolute; right: 0; bottom: 0; width: 190px; height: 190px; background: radial-gradient(circle at 100% 100%, rgba(0,0,0,.6), transparent 62%); }
+
+/* ---------- 2: stacked edges */
+.stack { position: absolute; inset: 0; border: 1px solid rgba(230,230,230,.2); background: #0d0d0f; }
+.stack.s1 { transform: translate(10px, 10px); }
+.stack.s2 { transform: translate(20px, 20px); border-color: rgba(230,230,230,.12); background: #080809; }
+
+/* ---------- 3: peek frames */
+.frames { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 26px; }
+.frame { position: relative; height: 330px; perspective: 1400px; }
+.frame .card { position: absolute; inset: 20px 10px 40px; transform-style: preserve-3d; }
+.frame .face { position: absolute; inset: 0; backface-visibility: hidden; border: 1px solid rgba(230,230,230,.2); overflow: hidden; }
+.frame .face img { width: 100%; height: 100%; object-fit: cover; }
+.frame .back { transform: rotateY(180deg); background: #050505; }
+.frame .edge { position: absolute; top: 0; bottom: 0; right: -6px; width: 6px; background: linear-gradient(#1b1b1f, #0b0b0d); transform-origin: left; transform: rotateY(90deg); }
+.frame .cap { position: absolute; left: 10px; bottom: 6px; font-size: 15px; color: #c4c4c4; }
+.frame .cap b { color: #ff4d00; font-family: 'Geist Mono', monospace; font-size: 12px; margin-right: 8px; }
+.arrow { position: absolute; top: 160px; font-size: 26px; color: #454545; }
+
+/* ---------- 4: label */
+.label { position: absolute; left: 14px; bottom: 14px; display: inline-flex; gap: 10px; align-items: center; padding: 8px 12px; background: rgba(0,0,0,.78); border: 1px solid rgba(230,230,230,.25); font-size: 16px; }
+.label i { font-style: normal; color: #ff4d00; font-size: 18px; }
+.label sup { color: #757575; font-size: 10px; }
+
+/* ---------- 5: hover tilt */
+.tilt { transform: rotateX(4deg) rotateY(-7deg) translateY(-8px) scale(1.015); box-shadow: 30px 40px 60px rgba(0,0,0,.85), 0 0 0 1px rgba(230,230,230,.3); }
+.glare { position: absolute; inset: 0; background: radial-gradient(500px 300px at 72% 30%, rgba(255,255,255,.12), transparent 60%); }
+.cursor { position: absolute; left: 600px; top: 160px; width: 44px; height: 44px; border-radius: 50%; background: #e6e6e6; color: #000; display: grid; place-items: center; font-size: 22px; box-shadow: 0 6px 18px rgba(0,0,0,.6); }
+.ghost { position: absolute; inset: 0; border: 1px dashed rgba(230,230,230,.18); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const v = new URLSearchParams(location.search).get('v') || '1'
+const IMG = '../../../public/work/build-websites.jpg'
+const NAMES = {
+  1: ['Option 1', 'Peeled corner', 'always visible · lifts a little more on hover'],
+  2: ['Option 2', 'Stacked edges', 'always visible · a small pile of cards behind the image'],
+  3: ['Option 3', 'One-time peek', 'plays once when the row scrolls into view (~0.8 s)'],
+  4: ['Option 4', 'Always-on label', 'the hover tag, shown all the time, with the count'],
+  5: ['Option 5', 'Tilt on hover', 'desktop only · card tips toward the mouse, flip cursor'],
+}
+const [num, name, sub] = NAMES[v]
+const header = `<div class="tagline"><b>${num}</b><span>${name}</span><em>${sub}</em></div>`
+const text = `<p class="desc">I can build the website your business needs: a focused landing page to launch a product, a full business site with booking and pages your team can edit, or an online store that loads fast and checks out smoothly on any device.</p>
+  <div><h3 class="title">Websites</h3></div>`
+const services = `<ul class="services" style="list-style:none">${['Landing pages','Business websites','Online stores','CMS · SEO','E-commerce · Payments'].map(s=>`<li>${s}</li>`).join('')}</ul>`
+let stage = ''
+if (v === '1') stage = `<div class="stage"><div class="media"><img src="${IMG}"><div class="shadowband"></div></div>
+  <div class="peel"><div class="under"></div><div class="wrap"><div class="flap"></div></div><div class="fold"></div><div class="count"><i>↻</i>4</div></div></div>`
+if (v === '2') stage = `<div class="stage"><div class="stack s2"></div><div class="stack s1"></div><div class="media"><img src="${IMG}"></div></div>`
+if (v === '4') stage = `<div class="stage"><div class="media"><img src="${IMG}"></div><div class="label"><i>↻</i> 4 past projects</div></div>`
+if (v === '5') stage = `<div class="stage"><div class="ghost"></div><div class="media tilt"><img src="${IMG}"><div class="glare"></div></div><div class="cursor">↻</div></div>`
+
+let body
+if (v === '3') {
+  const f = (deg, cap, label) => `<div class="frame"><div class="card" style="transform:rotateY(${deg}deg)">
+      <div class="face"><img src="${IMG}"></div><div class="face back"></div></div>
+      <div class="cap"><b>${label}</b>${cap}</div></div>`
+  body = `${header}<h2>What I Build<sup>(2)</sup></h2>
+    <div class="frames">${f(0, 'scrolls into view', '0.0 s')}${f(-18, 'turns as if starting to flip', '0.35 s')}${f(0, 'settles back', '0.8 s')}</div>
+    <p class="desc" style="margin-top:34px;max-width:900px">Played once per image, the first time the row appears on screen. Shown here as three frames of the same motion.</p>`
+} else {
+  body = `${header}<h2>What I Build<sup>(2)</sup></h2><div class="row">${stage}<div>${text.split('</p>')[0]}</p>${services}</div><div><h3 class="title">Websites</h3></div></div>`
+}
+document.getElementById('app').innerHTML = body
+</script>
+</body>
+</html>

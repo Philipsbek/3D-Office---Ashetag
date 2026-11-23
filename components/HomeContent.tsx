@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { site } from '@/content/site'
 import ContactForm from '@/components/ContactForm'
+import WorkShowcase from '@/components/WorkShowcase'
 
 export default function HomeContent() {
   return (
@@ -36,22 +37,7 @@ export default function HomeContent() {
         <h2 id="work-title" className="display-section rule-under">
           What I Build<sup className="counter">({site.work.length})</sup>
         </h2>
-        <ol className="projects">
-          {site.work.map((p) => (
-            <li key={p.title} className="project">
-              <div className="project-media">
-                <img src={p.image} alt={p.title} width={1600} height={900} loading="lazy" />
-              </div>
-              <p className="body concrete project-desc">{p.description}</p>
-              <h3 className="project-title">{p.title}</h3>
-              <ul className="project-services body">
-                {p.services.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
+        <WorkShowcase />
       </section>
 
       {/* ---------- capabilities ---------- */}

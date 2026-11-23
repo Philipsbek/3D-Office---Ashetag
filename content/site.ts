@@ -35,12 +35,24 @@ export const site = {
       description:
         'I can build the website your business needs: a focused landing page to launch a product, a full business site with booking and pages your team can edit, or an online store that loads fast and checks out smoothly on any device.',
       services: ['Landing pages', 'Business websites', 'Online stores', 'CMS · SEO', 'E-commerce · Payments'],
+      // Past projects on the back of the card (click the image).
+      // PLACEHOLDERS for now: swap in the real projects, screenshots and links when ready.
+      projects: [
+        { name: 'Prism K1', type: 'Landing page', year: '2026', image: '/work/build-landing.jpg', url: '' },
+        { name: 'Neon Motors', type: 'Business website', year: '2026', image: '/work/build-business.jpg', url: '' },
+        { name: 'Loftgear', type: 'Online store', year: '2025', image: '/work/build-store.jpg', url: '' },
+        { name: 'Studio Loft', type: 'Business website', year: '2025', image: '/work/desk.jpg', url: '' },
+      ],
     },
     {
       title: 'Web Apps',
       image: '/work/build-app.jpg',
       description: 'I can build dashboards, booking systems and portals with accounts, live data and real-time views.',
       services: ['Accounts', 'Databases', 'APIs'],
+      // PLACEHOLDER: replace with real web app projects
+      projects: [
+        { name: 'Deskhub', type: 'Booking dashboard', year: '2026', image: '/work/build-app.jpg', url: '' },
+      ],
     },
   ],
 
